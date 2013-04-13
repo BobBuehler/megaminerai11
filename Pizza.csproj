@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="AI.cs" />
     <Compile Include="BaseAI.cs" />
+    <Compile Include="Bb.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="ExistentialError.cs" />
     <Compile Include="Fish.cs" />
