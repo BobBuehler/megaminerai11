@@ -28,18 +28,18 @@ class AI : BaseAI
         JELLYFISH
     };
 
-    public static Species[] preferedSpeciesList = { speciesList[6],
-                                                        speciesList[0],
-                                                        speciesList[2],
-                                                        speciesList[8],
-                                                        speciesList[11],
-                                                        speciesList[1],
-                                                        speciesList[7],
-                                                        speciesList[3],
-                                                        speciesList[4],
-                                                        speciesList[5],
-                                                        speciesList[10],
-                                                        speciesList[9]};
+    public static SpeciesIndex[] preferedSpeciesList = { SpeciesIndex.TOMCOD,
+                                                        SpeciesIndex.SEA_STAR,
+                                                        SpeciesIndex.ANGELFISH,
+                                                        SpeciesIndex.CUTTLEFISH,
+                                                        SpeciesIndex.JELLYFISH,
+                                                        SpeciesIndex.SPONGE,
+                                                        SpeciesIndex.REEF_SHARK,
+                                                        SpeciesIndex.CONESHELL_SNAIL,
+                                                        SpeciesIndex.SEA_URCHIN,
+                                                        SpeciesIndex.OCTOPUS,
+                                                        SpeciesIndex.ELECTRIC_EEL,
+                                                        SpeciesIndex.CLEANER_SHRIMP };
 
     /// <summary>
     /// Returns your username.
@@ -206,7 +206,6 @@ class AI : BaseAI
     public AI(IntPtr c)
         : base(c)
     {
-        Console.WriteLine("AI: Hello World!");
     }
 
     #region Helper Methods
@@ -253,10 +252,11 @@ class AI : BaseAI
                 for (int i = 0; i < preferedSpeciesList.Length; i++)
                 {
                     // If the species is in season and we can afford it...
-                    if (preferedSpeciesList[i].Season == currentSeason() && players[playerID()].SpawnFood >= preferedSpeciesList[i].Cost)
+                    Species s = speciesList[(int)preferedSpeciesList[i]];
+                    if (s.Season == currentSeason() && players[playerID()].SpawnFood >= s.Cost)
                     {
                         // ...spawn it and break (can't spawn multiple fish on the same cove).
-                        preferedSpeciesList[i].spawn(tile);
+                        s.spawn(tile);
                         break;
                     }
                 }
