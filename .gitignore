@@ -1,3 +1,5 @@
+*.csproj
+
 #Codegen output doesn't go in the repository
 *.pyc
 codegen/output
