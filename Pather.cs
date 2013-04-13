@@ -128,7 +128,6 @@ namespace Pizza
 
         private static IEnumerable<Point> expand(Point point, BitArray passable)
         {
-            var points = new List<Point>(4);
             Point left = new Point(point.X - 1, point.Y);
             Point up = new Point(point.X, point.Y - 1);
             Point right = new Point(point.X + 1, point.Y);

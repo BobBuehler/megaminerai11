@@ -8,7 +8,7 @@ namespace Pizza
     /// <summary>
     /// Extends BaseAI with AI gameplay logic.
     /// </summary>
-    class AI : BaseAI
+    public class AI : BaseAI
     {
         /// <summary>
         /// Specifies the species available.
