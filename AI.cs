@@ -32,7 +32,7 @@ class AI : BaseAI
     /// <returns>Your username.</returns>
     public override string username()
     {
-        return "Shell AI";
+        return "Pizza Seeker";
     }
 
     /// <summary>
