@@ -67,8 +67,7 @@ namespace Pizza
         /// <returns>Return true to end your turn, return false to ask the server for updated information.</returns>
         public override bool run()
         {
-            // Test player.talk().
-            players[playerID()].talk("Help, I'm trapped inside the codegen!");
+            Bb.Update(this);
 
             spawn();
 
@@ -78,16 +77,57 @@ namespace Pizza
                 // Only attempt to move fish we own.
                 if (fish.Owner == playerID())
                 {
-                    BitArray basePassable = Bb.WallMap.Or(Bb.TheirCoveMap).Or(Bb.TheirFishMap).Or(Bb.OurFishMap);
+                    BitArray basePassable = Bb.WallMap.Or(Bb.CoveMap).Or(Bb.FishMap).Or(Bb.TrashMap).Not();
                     Point p = new Point(fish.X, fish.Y);
                     if (fish.CarryingWeight == 0)
                     {
                         // seek trash
-                        var path = Pather.aStar(p, Bb.OurTrashMap, Bb.
+                        var path = Pather.aStar(p, Bb.OurTrashMap, basePassable).ToArray();
+                        var goal = path[path.Length - 1];
+                        bool madeIt = true;
+                        for (int i = 1; i < path.Length - 1; ++i)
+                        {
+                            if (fish.MovementLeft > 0)
+                            {
+                                fish.move(path[i].X, path[i].Y);
+                            }
+                            else
+                            {
+                                madeIt = false;
+                                break;
+                            }
+                        }
+                        if (madeIt)
+                        {
+                            var goalTile = getTile(goal.X, goal.Y);
+                            fish.pickUp(goalTile, Math.Min(fish.CarryCap - fish.CarryingWeight, goalTile.TrashAmount));
+                        }
+                        Bb.Update(this);
+
                     }
-                    if (fish.CarryingWeight > 0)
+                    if (fish.CarryingWeight > 0 && fish.MovementLeft > 0)
                     {
                         // seek enemy reef
+                        var path = Pather.aStar(p, Bb.TheirReef, basePassable).ToArray();
+                        var goal = path[path.Length - 1];
+                        bool madeIt = true;
+                        for (int i = 1; i < path.Length - 1; ++i)
+                        {
+                            if (fish.MovementLeft > 0)
+                            {
+                                fish.move(path[i].X, path[i].Y);
+                            }
+                            else
+                            {
+                                madeIt = false;
+                                break;
+                            }
+                        }
+                        if (madeIt)
+                        {
+                            var goalTile = getTile(goal.X, goal.Y);
+                            fish.drop(goalTile, fish.CarryingWeight);
+                        }
                     }
                     //// Try to move to the right.
                     //if (fish.X + 1 < mapWidth()                                 // We aren't moving off the map.
@@ -149,7 +189,10 @@ namespace Pizza
         /// <summary>
         /// This function is called once, before your first turn.
         /// </summary>
-        public override void init() { }
+        public override void init()
+        {
+            Bb.init(this);
+        }
 
         /// <summary>
         /// This function is called once, after your last turn.

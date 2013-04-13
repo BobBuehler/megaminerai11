@@ -23,9 +23,9 @@ namespace Pizza
             }
         }
 
-        public static Point aStar(Point start, BitArray want, BitArray passable)
+        public static IEnumerable<Point> aStar(Point start, BitArray want, BitArray passable)
         {
-            return aStar(start, p => isSet(p, want), p => 0, passable).Last();
+            return aStar(start, p => isSet(p, want), p => 0, passable);
         }
 
         public static IEnumerable<Point> aStar(Point start, Point goal, BitArray passable)
