@@ -16,21 +16,22 @@ namespace Pizza
     class Mission
     {
         Fish m_agent;
-        int m_x = 0;
-        int m_y = 0;
-        Objective m_obj = Objective.goTo;
+        Point m_dest;
+        Objective m_obj;
 
 
-        Mission(Fish Agent)
+        public Mission(Fish Agent)
         {
             m_agent = Agent;
-
+            m_dest = new Point();
+            m_obj = Objective.goTo;
         }
 
-        Mission(Fish Agent, Objective O)
+        public Mission(Fish Agent, Objective Obj, Point Dest)
         {
             m_agent = Agent;
-            m_obj = O;
+            m_obj = Obj;
+            m_dest = Dest;
         }
 
 

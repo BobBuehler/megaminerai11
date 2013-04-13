@@ -9,7 +9,7 @@ class AI : BaseAI
     /// <summary>
     /// Specifies the species available.
     /// </summary>
-    enum SpeciesIndex
+    public enum SpeciesIndex
     {
         SEA_STAR,
         SPONGE,
@@ -53,25 +53,7 @@ class AI : BaseAI
         // Test player.talk().
         players[playerID()].talk("Help, I'm trapped inside the codegen!");
 
-        // Iterate across all tiles.
-        foreach (Tile tile in tiles)
-        {
-            // If the tile is yours, is not spawning a fish, and has no fish on it...
-            if (tile.Owner == playerID() && tile.HasEgg == 0 && getFish(tile.X, tile.Y) == null)
-            {
-                // ...iterate across all species.
-                for (int i = 0; i < speciesList.Length; i++)
-                {
-                    // If the species is in season and we can afford it...
-                    if (speciesList[i].Season == currentSeason() && players[playerID()].SpawnFood >= speciesList[i].Cost)
-                    {
-                        // ...spawn it and break (can't spawn multiple fish on the same cove).
-                        speciesList[i].spawn(tile);
-                        break;
-                    }
-                }
-            }
-        }
+        spawn();
 
         // Iterate through all the fishes.
         foreach (Fish fish in fishes)
@@ -146,6 +128,7 @@ class AI : BaseAI
     /// </summary>
     public override void end() { }
 
+
     /// <summary>
     /// Initializes a new instance of the AI class connected to the server.
     /// </summary>
@@ -182,4 +165,29 @@ class AI : BaseAI
         return null;
     }
     #endregion
+
+    //############################ our code ######################################
+    public void spawn()
+    {
+        // Iterate across all tiles.
+        foreach (Tile tile in tiles)
+        {
+            // If the tile is yours, is not spawning a fish, and has no fish on it...
+            if (tile.Owner == playerID() && tile.HasEgg == 0 && getFish(tile.X, tile.Y) == null)
+            {
+                // ...iterate across all species.
+                for (int i = 0; i < speciesList.Length; i++)
+                {
+                    // If the species is in season and we can afford it...
+                    if (speciesList[i].Season == currentSeason() && players[playerID()].SpawnFood >= speciesList[i].Cost)
+                    {
+                        // ...spawn it and break (can't spawn multiple fish on the same cove).
+                        speciesList[i].spawn(tile);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    //##################################################################
 }
