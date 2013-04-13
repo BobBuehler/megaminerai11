@@ -14,35 +14,38 @@ public class main
             System.Console.Write("Game Id: ");
             string gameId = System.Console.ReadLine();
             args = new string[] { defaultHost, gameId };
-        }
-
-        if (args[1] == "")
-        {
-            Bb.MaxX = 5;
-            Bb.MaxY = 5;
-            BitArray passable = new BitArray(new bool[] {
+            if (args[1] == "")
+            {
+                Bb.MaxX = 5;
+                Bb.MaxY = 5;
+                BitArray passable = new BitArray(new bool[] {
                 true, true, true, false, true,
                 true, false, false, true, true,
                 true, true, true, true, true,
                 false, false, false, true, true,
                 true, true, true, true, false });
-            foreach (Point p in Pather.aStar(new Point(3, 3), new Point(0, 0), passable))
-            {
-                Console.WriteLine(p);
-            }
-            BitArray want = new BitArray(new bool[] {
+                foreach (Point p in Pather.aStar(new Point(3, 3), new Point(0, 0), passable))
+                {
+                    Console.WriteLine(p);
+                }
+                BitArray want = new BitArray(new bool[] {
                 false, false, false, false, false,
                 false, false, false, false, false,
                 false, false, false, false, false,
                 false, false, false, false, false,
                 false, false, false, false, false });
-            Console.WriteLine(Pather.aStar(new Point(3, 3), want, passable));
-            return;
+                Console.WriteLine(Pather.aStar(new Point(3, 3), want, passable));
+                return;
+            }
         }
 
+
+        Console.WriteLine("Hi");
         IntPtr connection = Client.createConnection();
 
+        Console.WriteLine("Hi");
         AI ai = new AI(connection);
+        Console.WriteLine("Hi");
         if ((Client.serverConnect(connection, args[0], "19000")) == 0)
         {
             System.Console.WriteLine("Unable to connect to server");

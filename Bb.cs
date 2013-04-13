@@ -6,7 +6,7 @@ using System.Collections;
 
 namespace Pizza
 {
-    public static class Bb
+    static class Bb
     {
         public static int MaxX;
         public static int MaxY;
