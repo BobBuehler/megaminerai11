@@ -51,6 +51,7 @@
     <Compile Include="Fish.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Mappable.cs" />
+    <Compile Include="Mission.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Species.cs" />
