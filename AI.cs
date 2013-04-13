@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace Pizza
 {
@@ -77,57 +78,68 @@ namespace Pizza
                 // Only attempt to move fish we own.
                 if (fish.Owner == playerID())
                 {
-                    // Try to move to the right.
-                    if (fish.X + 1 < mapWidth()                                 // We aren't moving off the map.
-                        && fish.MovementLeft > 0                                // We have moves left.
-                        && getFish(fish.X + 1, fish.Y) == null                  // We aren't moving onto another fish.
-                        && getTile(fish.X + 1, fish.Y).Owner != 1 - playerID()  // We aren't moving onto an enemy cove.
-                        && getTile(fish.X + 1, fish.Y).Owner != 3               // We aren't move onto a wall.
-                        && getTile(fish.X + 1, fish.Y).HasEgg == 0              // We aren't moving onto an egg.
-                        && getTile(fish.X + 1, fish.Y).TrashAmount == 0)        // We aren't moving onto trash.
+                    BitArray basePassable = Bb.WallMap.Or(Bb.TheirCoveMap).Or(Bb.TheirFishMap).Or(Bb.OurFishMap);
+                    Point p = new Point(fish.X, fish.Y);
+                    if (fish.CarryingWeight == 0)
                     {
-                        // Move one tile to the right.
-                        fish.move(fish.X + 1, fish.Y);
+                        // seek trash
+                        var path = Pather.aStar(p, Bb.OurTrashMap, Bb.
                     }
+                    if (fish.CarryingWeight > 0)
+                    {
+                        // seek enemy reef
+                    }
+                    //// Try to move to the right.
+                    //if (fish.X + 1 < mapWidth()                                 // We aren't moving off the map.
+                    //    && fish.MovementLeft > 0                                // We have moves left.
+                    //    && getFish(fish.X + 1, fish.Y) == null                  // We aren't moving onto another fish.
+                    //    && getTile(fish.X + 1, fish.Y).Owner != 1 - playerID()  // We aren't moving onto an enemy cove.
+                    //    && getTile(fish.X + 1, fish.Y).Owner != 3               // We aren't move onto a wall.
+                    //    && getTile(fish.X + 1, fish.Y).HasEgg == 0              // We aren't moving onto an egg.
+                    //    && getTile(fish.X + 1, fish.Y).TrashAmount == 0)        // We aren't moving onto trash.
+                    //{
+                    //    // Move one tile to the right.
+                    //    fish.move(fish.X + 1, fish.Y);
+                    //}
 
-                    // Try to pick up trash one tile below the fish.
-                    if (fish.Y + 1 < mapHeight()                            // Ensure we do not pick up off the map.
-                        && getTile(fish.X, fish.Y + 1).TrashAmount > 0      // Ensure the tile has trash.
-                        && fish.CarryCap - fish.CarryingWeight > 0          // Ensure we have the necessary capacity.
-                        && fish.CurrentHealth >= 1)                         // Ensure we have enough health.
-                    {
-                        // Pick up trash one tile below the fish.
-                        fish.pickUp(getTile(fish.X, fish.Y + 1), 1);
-                    }
+                    //// Try to pick up trash one tile below the fish.
+                    //if (fish.Y + 1 < mapHeight()                            // Ensure we do not pick up off the map.
+                    //    && getTile(fish.X, fish.Y + 1).TrashAmount > 0      // Ensure the tile has trash.
+                    //    && fish.CarryCap - fish.CarryingWeight > 0          // Ensure we have the necessary capacity.
+                    //    && fish.CurrentHealth >= 1)                         // Ensure we have enough health.
+                    //{
+                    //    // Pick up trash one tile below the fish.
+                    //    fish.pickUp(getTile(fish.X, fish.Y + 1), 1);
+                    //}
 
-                    // Try to drop trash one tile above the fish.
-                    if (fish.Y - 1 >= 0                             // Ensure we do not drop off the map.
-                        && fish.CarryingWeight > 0                  // Ensure we have something to drop.
-                        && getFish(fish.X, fish.Y - 1) == null)     // Ensure we don't drop on a fish.
-                    {
-                        // Drop trash one tile above the fish.
-                        fish.drop(getTile(fish.X, fish.Y - 1), 1);
-                    }
+                    //// Try to drop trash one tile above the fish.
+                    //if (fish.Y - 1 >= 0                             // Ensure we do not drop off the map.
+                    //    && fish.CarryingWeight > 0                  // Ensure we have something to drop.
+                    //    && getFish(fish.X, fish.Y - 1) == null)     // Ensure we don't drop on a fish.
+                    //{
+                    //    // Drop trash one tile above the fish.
+                    //    fish.drop(getTile(fish.X, fish.Y - 1), 1);
+                    //}
 
-                    // Try to do an action to the left based on species.
-                    if (fish.X - 1 > 0                                      // We are not attacking off the map.
-                        && fish.AttacksLeft > 0                             // We have attacks left.
-                        && getFish(fish.X - 1, fish.Y) != null)             // There is a fish at that spot.
-                    {
-                        // If we're not a cleaner shrimp...
-                        if ((SpeciesIndex)fish.Species != SpeciesIndex.CLEANER_SHRIMP)
-                        {
-                            // Try to attack fish to the left.
-                            if (getFish(fish.X - 1, fish.Y).Owner != playerID()) // The fish belongs to the opponent.
-                                fish.attack(getFish(fish.X - 1, fish.Y));
-                        }
-                        else
-                        {
-                            // Try to heal allied fish to the left.
-                            if (getFish(fish.X - 1, fish.Y).Owner == playerID()) // The fish belongs to me.
-                                fish.attack(getFish(fish.X - 1, fish.Y));
-                        }
-                    }
+                    //// Try to do an action to the left based on species.
+                    //if (fish.X - 1 > 0                                      // We are not attacking off the map.
+                    //    && fish.AttacksLeft > 0                             // We have attacks left.
+                    //    && getFish(fish.X - 1, fish.Y) != null)             // There is a fish at that spot.
+                    //{
+                    //    // If we're not a cleaner shrimp...
+                    //    if ((SpeciesIndex)fish.Species != SpeciesIndex.CLEANER_SHRIMP)
+                    //    {
+                    //        // Try to attack fish to the left.
+                    //        if (getFish(fish.X - 1, fish.Y).Owner != playerID()) // The fish belongs to the opponent.
+                    //            fish.attack(getFish(fish.X - 1, fish.Y));
+                    //    }
+                    //    else
+                    //    {
+                    //        // Try to heal allied fish to the left.
+                    //        if (getFish(fish.X - 1, fish.Y).Owner == playerID()) // The fish belongs to me.
+                    //            fish.attack(getFish(fish.X - 1, fish.Y));
+                    //    }
+                    //}
                 }
             }
 

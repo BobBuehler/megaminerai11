@@ -23,7 +23,7 @@ namespace Pizza
             }
         }
 
-        public static Point findNearest(Point start, BitArray want, BitArray passable)
+        public static Point aStar(Point start, BitArray want, BitArray passable)
         {
             return aStar(start, p => isSet(p, want), p => 0, passable).Last();
         }

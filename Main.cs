@@ -36,7 +36,7 @@ public class main
                 false, false, false, false, false,
                 false, false, false, false, false,
                 false, false, false, false, false });
-            Console.WriteLine(Pather.findNearest(new Point(3, 3), want, passable));
+            Console.WriteLine(Pather.aStar(new Point(3, 3), want, passable));
             return;
         }
 
