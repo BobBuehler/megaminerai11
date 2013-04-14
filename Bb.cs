@@ -140,37 +140,22 @@ namespace Pizza
             //Fill Reef Maps
             foreach (var tile in BaseAI.tiles)
             {
-                if (ai.playerID() == 0)
+                if (tile.Damages == ai.playerID())
                 {
-                    if (tile.X <= 14)
-                    {
-                        OurReef[GetOffset(tile.X, tile.Y)] = true;
-                    }
-                    else if (tile.X > 14 && tile.X <= 24)
-                    {
-                        NeutralReef[GetOffset(tile.X, tile.Y)] = true;
-                    }
-                    else
-                    {
-                        TheirReef[GetOffset(tile.X, tile.Y)] = true;
-                    }
+                    OurReef[GetOffset(tile.X, tile.Y)] = true;
+                }
+                else if (tile.Damages == 1 - ai.playerID())
+                {
+                    TheirReef[GetOffset(tile.X, tile.Y)] = true;
                 }
                 else
                 {
-                    if (tile.X <= 14)
-                    {
-                        TheirReef[GetOffset(tile.X, tile.Y)] = true;
-                    }
-                    else if (tile.X > 14 && tile.X <= 24)
-                    {
-                        NeutralReef[GetOffset(tile.X, tile.Y)] = true;
-                    }
-                    else
-                    {
-                        OurReef[GetOffset(tile.X, tile.Y)] = true;
-                    }
+                    NeutralReef[GetOffset(tile.X, tile.Y)] = true;
                 }
             }
+            Console.WriteLine(Bb.ToString(OurReef));
+            Console.WriteLine(Bb.ToString(NeutralReef));
+            Console.WriteLine(Bb.ToString(TheirReef));
 
             //BaseAI.fishes.ToList().ForEach(fish => FishMap.Set(GetOffset(fish.X, fish.Y), true));
 
@@ -515,6 +500,11 @@ namespace Pizza
             TheirTrashMap = new BitArray(TrashMap).And(TheirReef);
         }
 
+        public static BitArray GetPassable()
+        {
+            return new BitArray(Bb.WallMap).Or(Bb.CoveMap).Or(Bb.FishMap).Or(Bb.TrashMap).Not();
+        }
+
         public static int GetOffset(int x, int y)
         {
             return (y * MaxX + x);
@@ -532,7 +522,7 @@ namespace Pizza
             {
                 for (int x = 0; x < MaxX; ++x)
                 {
-                    builder.Append(Get(board, x, y) ? '#': '-');
+                    builder.Append(Get(board, x, y) ? '#' : '-');
                 }
                 builder.AppendLine();
             }

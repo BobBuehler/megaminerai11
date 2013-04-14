@@ -35,10 +35,8 @@ class AI : BaseAI
                                                         SpeciesIndex.JELLYFISH,
                                                         SpeciesIndex.SPONGE,
                                                         SpeciesIndex.REEF_SHARK,
-                                                        SpeciesIndex.CONESHELL_SNAIL,
                                                         SpeciesIndex.SEA_URCHIN,
                                                         SpeciesIndex.OCTOPUS,
-                                                        SpeciesIndex.ELECTRIC_EEL,
                                                         SpeciesIndex.CLEANER_SHRIMP };
 
     //HashSet<Fish> starfish = new HashSet<Fish>();
@@ -82,33 +80,33 @@ class AI : BaseAI
     public override bool run()
     {
         Bb.Update(this);
-
         spawn();
 
-        Console.WriteLine("Trash:");
-        Console.WriteLine(Bb.ToString(Bb.TrashMap));
         // Iterate through all the fishes.
         foreach (Fish fish in fishes)
         {
             // Only attempt to move fish we own.
             if (fish.Owner == playerID())
             {
-                Console.WriteLine("Fish:" + fish.Id);
-                if (fish.CarryingWeight == 0)
+                while (fish.MovementLeft > 0)
                 {
-                    goNearAndDoSomething(fish, Bb.TrashMap, g =>
+                    if (fish.CarryingWeight == 0)
                     {
-                        var tile = getTile(g.X, g.Y);
-                        fish.pickUp(tile, Math.Min(fish.CarryCap - fish.CarryingWeight, tile.TrashAmount));
-                    });
-                }
-                if (fish.CarryingWeight > 0 && fish.MovementLeft > 0)
-                {
-                    goNearAndDoSomething(fish, Bb.TrashMap, g =>
+                        Bb.Update(this);
+                        goNearAndDoSomething(fish, Bb.OurTrashMap, t =>
+                        {
+                            int amount = Math.Min(fish.CarryCap - fish.CarryingWeight, t.TrashAmount);
+                            fish.pickUp(t, Math.Min(fish.CarryCap - fish.CarryingWeight, t.TrashAmount));
+                        });
+                    }
+                    if (fish.CarryingWeight > 0 && fish.MovementLeft > 0)
                     {
-                        var tile = getTile(g.X, g.Y);
-                        fish.drop(tile, fish.CarryingWeight);
-                    });
+                        Bb.Update(this);
+                        goNearAndDoSomething(fish, Bb.GetPassable().And(Bb.TheirReef).Or(Bb.TheirTrashMap), t =>
+                        {
+                            fish.drop(t, fish.CarryingWeight);
+                        });
+                    }
                 }
             }
         }
@@ -195,15 +193,14 @@ class AI : BaseAI
         }
     }
 
-    public void goNearAndDoSomething(Fish fish, BitArray want, Action<Point> something)
+    public void goNearAndDoSomething(Fish fish, BitArray want, Action<Tile> something)
     {
-        Point p = new Point(fish.X, fish.Y);
+        Point fishPoint = new Point(fish.X, fish.Y);
 
-        Bb.Update(this);
-        BitArray passable = new BitArray(Bb.WallMap).Or(Bb.CoveMap).Or(Bb.FishMap).Not().Or(want);
-        passable.Set(Bb.GetOffset(p.X, p.Y), true);
+        BitArray passable = Bb.GetPassable().Or(want);
+        passable.Set(Bb.GetOffset(fishPoint.X, fishPoint.Y), true);
 
-        var path = Pather.aStar(p, Bb.OurTrashMap, passable).ToArray();
+        var path = Pather.aStar(fishPoint, want, passable).ToArray();
         if (path.Length > 1)
         {
             var goal = path[path.Length - 1];
@@ -224,8 +221,7 @@ class AI : BaseAI
             if (madeIt)
             {
                 Console.WriteLine("({0},{1}) did reach {2}", fish.X, fish.Y, goal);
-                var goalTile = getTile(goal.X, goal.Y);
-                something(goal);
+                something(getTile(goal.X, goal.Y));
             }
         }
     }
