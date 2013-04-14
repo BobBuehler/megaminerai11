@@ -20,7 +20,7 @@ namespace Pizza
                 case Objective.goTo:
                     GoTo(ai, mission);
                     break;
-                case Objective.getNearestTrash:
+                case Objective.getTrash:
                     GetNearestTrash(ai, mission);
                     break;
             }
