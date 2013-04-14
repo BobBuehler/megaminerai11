@@ -81,8 +81,13 @@ class AI : BaseAI
     {
         Bb.Update(this);
         spawn();
-        assignmissions();
-        Executor.Execute(this, missions);
+
+        Executor.Execute(this, fishes.Where(f => f.Owner == playerID()).Select(f => new Mission[]
+            {
+                new Mission(f, Objective.getNearestTrash, () => Bb.OurTrashMap),
+                new Mission(f, Objective.dumpTrash, () => Bb.TheirReef)
+            }.ToList()
+        ).ToList());
         return true;
     }
 
