@@ -153,7 +153,7 @@ class AI : BaseAI
             removeDeadFish();
             if (specialsRequired())
             {
-                maxExtraNonCarries = 7;
+                maxExtraNonCarries = 5;
                 foreach (Tile tile in Bb.OurCoveSet)
                 {
                     if (emergencyCarriers.Count < 3 && getFish(tile.X, tile.Y) != null)
@@ -165,7 +165,7 @@ class AI : BaseAI
                 {
                     foreach (Fish f in fishes)
                     {
-                        if (f.Owner == playerID() && emergencyCarriers.Count < 2)
+                        if (f.Owner == playerID() && emergencyCarriers.Count < 3)
                         {
                             emergencyCarriers.Add(f.Id);
                         }
@@ -299,7 +299,11 @@ class AI : BaseAI
         {
             return false;
         }
-        else if (nonCarryCount() >= carryCount() + maxExtraNonCarries || nonCarryCount() > 6)
+        else if (s.SpeciesNum == (int)SpeciesIndex.CONESHELL_SNAIL && (Bb.OurSnailsSet.Count + 1 > Bb.OurSharksSet.Count && speciesList[(int)SpeciesIndex.REEF_SHARK].Season == currentSeason()))
+        {
+            return false;
+        }
+        else if (nonCarryCount() >= carryCount() + maxExtraNonCarries || nonCarryCount() > 5)
         {
             return false;
         }
@@ -543,9 +547,11 @@ class AI : BaseAI
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));//todo:dump at coves/far
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirCoveMap));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirDeepestReef));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.NeutralReef));
+            mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
             missions.Add(mission);
         }
