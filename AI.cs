@@ -156,16 +156,16 @@ class AI : BaseAI
                 maxExtraNonCarries = 7;
                 foreach (Tile tile in Bb.OurCoveSet)
                 {
-                    if (emergencyCarriers.Count < 2 && getFish(tile.X, tile.Y) != null)
+                    if (emergencyCarriers.Count < 3 && getFish(tile.X, tile.Y) != null)
                     {
                         emergencyCarriers.Add(getFish(tile.X, tile.Y).Id);
                     }
                 }
-                if (emergencyCarriers.Count < 2)
+                if (emergencyCarriers.Count < 3)
                 {
                     foreach (Fish f in fishes)
                     {
-                        if (f.Owner == playerID())
+                        if (f.Owner == playerID() && emergencyCarriers.Count < 2)
                         {
                             emergencyCarriers.Add(f.Id);
                         }
@@ -184,6 +184,7 @@ class AI : BaseAI
                     mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
                     mission.Add(new Mission(f, Objective.getTrash, ourTrash));
                     mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
+                    mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.NeutralReef));
                     mission.Add(new Mission(f, Objective.getTrash, ourTrash));
                     missions.Add(mission);
                 }
@@ -438,18 +439,18 @@ class AI : BaseAI
 
     public void assignmissions()
     {
-        assignStarfish();
-        assignSponges();
-        assignAngelfishes();
+        assignJellyFishes();
+        assignOctopi();
+        assignCuttleFishes();
+        assignSharks();        
         assignSnails();
         assignUrchins();
-        assignOctopi();
         assignTomcods();
-        assignSharks();
-        assignCuttleFishes();
-        assignShrimp();
+        assignAngelfishes();
+        assignStarfish();
+        assignSponges();
         assignEels();
-        assignJellyFishes();
+        assignShrimp();
     }
 
 
@@ -461,6 +462,7 @@ class AI : BaseAI
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));//todo: if starfish is not on their reef
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.NeutralReef));
             mission.Add(new Mission(f, Objective.goTo, () => Bb.TheirDeepestReef));//todo: if not implemented go to edge
             mission.Add(new Mission(f, Objective.surviveWithInTarget, () => Bb.TheirReef, false));
 
@@ -476,6 +478,7 @@ class AI : BaseAI
             mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.NeutralReef));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
             mission.Add(new Mission(f, Objective.dontsuicide, () => Bb.TheirReef));
             mission.Add(new Mission(f, Objective.attackTarget, notUrchin));
@@ -491,6 +494,7 @@ class AI : BaseAI
             mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));//todo: change their reef to their coves??
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.NeutralReef));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
             mission.Add(new Mission(f, Objective.dontsuicide, () => Bb.TheirReef));
             mission.Add(new Mission(f, Objective.attackTarget, notUrchin));
@@ -540,6 +544,8 @@ class AI : BaseAI
             mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));//todo:dump at coves/far
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirDeepestReef));
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.NeutralReef));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
             missions.Add(mission);
         }
@@ -572,6 +578,7 @@ class AI : BaseAI
             mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.NeutralReef));
             mission.Add(new Mission(f, Objective.attackTarget, () => Bb.OurFishMap));
             missions.Add(mission);
         }
