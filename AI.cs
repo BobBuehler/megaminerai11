@@ -468,8 +468,6 @@ class AI : BaseAI
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.NeutralReef));
             mission.Add(new Mission(f, Objective.goTo, () => Bb.TheirDeepestReef));//todo: if not implemented go to edge
-            mission.Add(new Mission(f, Objective.surviveWithInTarget, () => Bb.TheirReef, false));
-
             missions.Add(mission);
         }
     }
@@ -497,6 +495,7 @@ class AI : BaseAI
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
+            mission.Add(new Mission(f, Objective.coverWithTrash, () => Bb.TheirReef));//todo: change their reef to their coves??
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));//todo: change their reef to their coves??
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.NeutralReef));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
@@ -547,7 +546,7 @@ class AI : BaseAI
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));//todo:dump at coves/far
-            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirCoveMap));
+            mission.Add(new Mission(f, Objective.coverWithTrash, () => Bb.TheirCoveMap));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirDeepestReef));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.NeutralReef));

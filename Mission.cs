@@ -11,6 +11,7 @@ namespace Pizza
         goTo,
         getTrash,
         dumpTrash,
+        coverWithTrash,
         surviveWithInTarget,
         attackTarget,
         dontsuicide
