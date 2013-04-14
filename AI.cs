@@ -68,6 +68,8 @@ class AI : BaseAI
     /// <returns>Return true to end your turn, return false to ask the server for updated information.</returns>
     public override bool run()
     {
+        Console.WriteLine("Turn:{0}", iteration);
+
         Bb.Update(this);
         spawn();
         assignmissions();
@@ -264,6 +266,7 @@ class AI : BaseAI
 
     public void assignmissions()
     {
+        missions.Clear();
         assignStarfish();
         assignSponges();
         assignAngelfishes();
