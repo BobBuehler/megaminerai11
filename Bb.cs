@@ -504,7 +504,7 @@ namespace Pizza
 
         public static BitArray GetNAwayFromPoint(int n, Point point)
         {
-            BitArray nAwayFromPoint = new BitArray(AI.tiles.Length);
+            BitArray nAwayFromPoint = new BitArray(MaxX*MaxY);
             int x = point.X;
             int y = point.Y;
 
@@ -554,7 +554,7 @@ namespace Pizza
 
         public static BitArray GetNAwayFromPointMovable(int n, Point point)
         {
-            BitArray nAwayFromPointMovable = new BitArray(AI.tiles.Length);
+            BitArray nAwayFromPointMovable = new BitArray(MaxX * MaxY);
 
             BitArray nAwayFromPoint = GetNAwayFromPoint(n, point);
             BitArray passable = GetPassable();
@@ -566,10 +566,14 @@ namespace Pizza
             while (Q.Count > 0)
             {
                 Point current = Q.Dequeue();
-
                 if (new BitArray(passable).And(nAwayFromPoint)[GetOffset(current.X, current.Y)])
                 {
+                    Console.WriteLine("Add");
                     nAwayFromPointMovable[GetOffset(current.X, current.Y)] = true;
+                }
+                else if (current.Equals(point))
+                {
+                    //continue to foreach
                 }
                 else
                 {
@@ -622,7 +626,7 @@ namespace Pizza
 
             for (int i = 0; i < MaxX; i++)
             {
-                for (int j = 0; i < MaxY; j++)
+                for (int j = 0; j < MaxY; j++)
                 {
                     if (Get(bB, i, j))
                     {
