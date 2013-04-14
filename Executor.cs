@@ -108,7 +108,7 @@ namespace Pizza
             Bb.Update(ai);
 
             BitArray targets = new BitArray(mission.m_targets());
-            BitArray passable = Bb.GetPassable(fishPoint);
+            BitArray passable = Bb.GetPassable(fishPoint).Or(Bb.TheirTrashMap);
 
             var path = Pather.aStar(fishPoint, targets, passable).ToArray();
             if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - 1)))
