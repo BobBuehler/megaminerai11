@@ -28,10 +28,12 @@ class AI : BaseAI
         JELLYFISH
     };
 
-    public static SpeciesIndex[] preferedSpeciesList = { SpeciesIndex.CUTTLEFISH,
-                                                           SpeciesIndex.CONESHELL_SNAIL,
-                                                           SpeciesIndex.TOMCOD,
-                                                        SpeciesIndex.ANGELFISH,                                                        
+    public static SpeciesIndex[] preferedSpeciesList = { SpeciesIndex.TOMCOD,
+                                                        SpeciesIndex.CONESHELL_SNAIL,
+                                                        SpeciesIndex.CUTTLEFISH,
+                                                        SpeciesIndex.ANGELFISH,
+                                                        
+
                                                         
                                                         SpeciesIndex.JELLYFISH,
                                                         SpeciesIndex.REEF_SHARK,
