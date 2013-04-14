@@ -554,29 +554,39 @@ namespace Pizza
 
         public static BitArray GetNAwayFromPointMovable(int n, Point point)
         {
-            int x = point.X;
-            int y = point.Y;
             BitArray nAwayFromPointMovable = new BitArray(AI.tiles.Length);
 
-
-
-
-
-            return nAwayFromPointMovable;
-        }
-
-        public static bool IsReachable(Point origin, Point destination, BitArray bB)
-        {
+            BitArray nAwayFromPoint = GetNAwayFromPoint(n, point);
+            BitArray passable = GetPassable();
+            HashSet<Point> visited = new HashSet<Point>();
             Queue<Point> Q = new Queue<Point>();
-            HashSet<Point> Visited = new HashSet<Point>();
+            Q.Enqueue(point);
+            visited.Add(point);
 
-            Q.Enqueue(origin);
             while (Q.Count > 0)
             {
                 Point current = Q.Dequeue();
+
+                if (new BitArray(passable).And(nAwayFromPoint)[GetOffset(current.X, current.Y)])
+                {
+                    nAwayFromPointMovable[GetOffset(current.X, current.Y)] = true;
+                }
+                else
+                {
+                    continue;
+                }
+                foreach (Point p in BitArrayToList(GetNAwayFromPoint(1, current)))
+                {
+                    if (!visited.Contains(p))
+                    {
+                        visited.Add(p);
+                        Q.Enqueue(p);
+                    }
+                }
             }
 
-            return true;
+            return nAwayFromPointMovable;
+
         }
 
         public static BitArray GetPassable()
@@ -604,6 +614,25 @@ namespace Pizza
         public static void Set(BitArray board, Point point, bool value)
         {
             board.Set(GetOffset(point.X, point.Y), value);
+        }
+
+        public static List<Point> BitArrayToList(BitArray bB)
+        {
+            List<Point> trues = new List<Point>();
+
+            for (int i = 0; i < MaxX; i++)
+            {
+                for (int j = 0; i < MaxY; j++)
+                {
+                    if (Get(bB, i, j))
+                    {
+                        trues.Add(new Point(i, j));
+                    }
+                }
+            }
+
+            return trues;
+
         }
 
         public static string ToString(BitArray board)
