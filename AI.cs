@@ -45,6 +45,7 @@ class AI : BaseAI
     Func<BitArray> ourTrash = () => Bb.OurReef;
     Func<BitArray> notUrchin = () => new BitArray(Bb.TheirUrchinsMap).Not();
     List<int> emergencyCarriers = new List<int>();
+    List<Tile> OrderedOurCoveSet = new List<Tile>();
     int maxExtraNonCarries = 3;
 
     /// <summary>
@@ -98,6 +99,23 @@ class AI : BaseAI
     public override void init()
     {
         Bb.init(this);
+        OrderedOurCoveSet = new List<Tile>(Bb.OurCoveSet);
+        OrderedOurCoveSet.Sort(new CoveComparer(new Point(Bb.MaxX / 2, Bb.MaxY / 2)));
+    }
+
+    private class CoveComparer : IComparer<Tile>
+    {
+        private Point m_center;
+        public CoveComparer(Point center)
+        {
+            m_center = center;
+        }
+
+        int IComparer<Tile>.Compare(Tile a, Tile b)
+        {
+            return Pather.ManhattanDistance(a.Point(), m_center)
+                - Pather.ManhattanDistance(b.Point(), m_center);
+        }
     }
 
     /// <summary>
