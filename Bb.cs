@@ -140,7 +140,8 @@ namespace Pizza
             TheirEelsMap = new BitArray(AI.tiles.Length);
             TheirJellyfishMap = new BitArray(AI.tiles.Length);
 
-
+            OurDeepestReef = new BitArray(AI.tiles.Length);
+            TheirDeepestReef = new BitArray(AI.tiles.Length);
 
             //Fill Reef Maps
             foreach (var tile in BaseAI.tiles)
@@ -158,7 +159,7 @@ namespace Pizza
                     NeutralReef[GetOffset(tile.X, tile.Y)] = true;
                 }
             }
-            if (BaseAI.tiles[GetOffset(MaxX-1, 0)].Damages == ai.playerID())
+            if (ai.getTile(MaxX-1, 0).Damages == ai.playerID())
             {
                 foreach (Tile t in BaseAI.tiles)
                 {
