@@ -258,9 +258,9 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurSnailsMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.attackIfInRange, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));//todo:snails protect our borders?
-            mission.Add(new Mission(f, Objective.goNextTo, () => Bb.TheirCoveMap));
-            mission.Add(new Mission(f, Objective.killClosestTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap)),true));//todo:snails protect our borders?
+            mission.Add(new Mission(f, Objective.goTo, () => Bb.TheirCoveMap));//todo:broken
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
         }
     }
@@ -269,9 +269,9 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurUrchinsMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.attackIfInRange, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
-            mission.Add(new Mission(f, Objective.goNextTo, () => Bb.TheirCoveMap));
-            mission.Add(new Mission(f, Objective.killClosestTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap)),true));
+            mission.Add(new Mission(f, Objective.goTo, () => Bb.TheirCoveMap));//todo:broken
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
         }
     }
@@ -280,9 +280,9 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurOctopiMap)
         {
             List<Mission> mission = new List<Mission>();//todo: camp center?
-            mission.Add(new Mission(f, Objective.attackIfInRange, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));//todo: implement multiple attacks
-            mission.Add(new Mission(f, Objective.goNextTo, () => Bb.TheirCoveMap));
-            mission.Add(new Mission(f, Objective.killClosestTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap)),true));//todo: implement multiple attacks
+            mission.Add(new Mission(f, Objective.goTo, () => Bb.TheirCoveMap));//todo:broken
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
         }
     }
@@ -301,8 +301,7 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurSharksMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.killClosestTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
-            mission.Add(new Mission(f, Objective.killClosestTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
         }
     }

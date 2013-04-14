@@ -23,7 +23,7 @@ namespace Pizza
         public bool m_attackAlongTheWay;
         public bool m_moveIffAcheivable;
 
-        public Mission(Fish Agent, Objective Obj, Func<BitArray> Targets, bool AttackAlongTheWay = true, bool MoveIffAcheivable = false)
+        public Mission(Fish Agent, Objective Obj, Func<BitArray> Targets, bool MoveIffAcheivable = false, bool AttackAlongTheWay = true)
         {
             m_agent = Agent;
             m_obj = Obj;
