@@ -72,7 +72,6 @@ class AI : BaseAI
     /// <returns>Return true to end your turn, return false to ask the server for updated information.</returns>
     public override bool run()
     {
-        Console.WriteLine("Turn:{0}", iteration);
         if (turnNumber() >= 30)
         {
             ourTrash = () => new BitArray(Bb.OurReef).Or(Bb.NeutralReef);

@@ -8,6 +8,14 @@ namespace Pizza
 {
     static class Executor
     {
+        private static Dictionary<Fish, HashSet<Fish>> alreadyAttacked = new Dictionary<Fish, HashSet<Fish>>();
+        private static HashSet<Fish> onADropMission = new HashSet<Fish>();
+        public static void NewTurn()
+        {
+            alreadyAttacked.Clear();
+            onADropMission.Clear();
+        }
+
         public static void Execute(AI ai, List<List<Mission>> missions)
         {
             NewTurn();
@@ -21,7 +29,11 @@ namespace Pizza
                 return;
             }
 
-            Console.WriteLine("{0}:{1}", mission.m_agent.Text(), mission.m_obj);
+            if (onADropMission.Contains(mission.m_agent) && !mission.m_overrideDropMission)
+            {
+                return;
+            }
+
             switch (mission.m_obj)
             {
                 case Objective.goTo:
@@ -130,6 +142,10 @@ namespace Pizza
                 var tile = ai.getTile(dump.X, dump.Y);
                 fish.drop(tile, weight);
             }
+            else if (path.Length > 1)
+            {
+                onADropMission.Add(fish);
+            }
         }
 
         public static void CoverWithTrash(AI ai, Mission mission)
@@ -155,6 +171,10 @@ namespace Pizza
                 var dump = path[path.Length - 1];
                 var tile = ai.getTile(dump.X, dump.Y);
                 fish.drop(tile, weight);
+            }
+            else if (path.Length > 1)
+            {
+                onADropMission.Add(fish);
             }
         }
 
@@ -199,12 +219,6 @@ namespace Pizza
                     return;
                 }
             }
-        }
-
-        private static Dictionary<Fish, HashSet<Fish>> alreadyAttacked = new Dictionary<Fish, HashSet<Fish>>();
-        public static void NewTurn()
-        {
-            alreadyAttacked.Clear();
         }
 
         private static HashSet<Fish> GetAlreadyAttacked(Fish agent)
