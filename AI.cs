@@ -180,7 +180,7 @@ class AI : BaseAI
     {
         if (turnNumber() < 455 && turnNumber() % seasonLength() < 21 && getNextSelectionPriority() > getThisSeasonPriority())
         {
-            return true;
+            return false;
         }
         return false;
     }
