@@ -81,6 +81,7 @@ class AI : BaseAI
     {
         Bb.Update(this);
         spawn();
+        assignmissions();
         Executor.Execute(this, missions);
         return true;
     }
@@ -197,9 +198,20 @@ class AI : BaseAI
         }
     }
 
-    public void assignmission()
+    public void assignmissions()
     {
         assignStarfish();
+        assignSponges();
+        assignAngelfishes();
+        assignSnails();
+        assignUrchins();
+        assignOctopi();
+        assignTomcods();
+        assignSharks();
+        assignCuttleFishes();
+        assignShrimp();
+        assignEels();
+        assignJellyFishes();
     }
 
 
