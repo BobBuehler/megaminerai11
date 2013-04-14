@@ -81,12 +81,7 @@ class AI : BaseAI
     {
         Bb.Update(this);
         spawn();
-
-        foreach (List<Mission> career in missions)
-        {
-
-        }
-
+        Executor.Execute(this, missions);
         return true;
     }
 
