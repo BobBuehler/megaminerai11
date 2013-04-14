@@ -300,7 +300,11 @@ class AI : BaseAI
         {
             return false;
         }
-        else if (s.SpeciesNum == (int)SpeciesIndex.CONESHELL_SNAIL && (Bb.OurSnailsSet.Count + 3 > Bb.OurSharksSet.Count && speciesList[(int)SpeciesIndex.REEF_SHARK].Season == currentSeason()))
+        else if (s.SpeciesNum == (int)SpeciesIndex.CUTTLEFISH && (Bb.OurTomcodsSet.Count < 1 && speciesList[(int)SpeciesIndex.TOMCOD].Season == currentSeason()))
+        {
+            return false;
+        }
+        else if (s.SpeciesNum == (int)SpeciesIndex.CONESHELL_SNAIL && (Bb.OurTomcodsSet.Count <1 && speciesList[(int)SpeciesIndex.TOMCOD].Season == currentSeason()))
         {
             return false;
         }
