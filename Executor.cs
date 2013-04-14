@@ -23,6 +23,9 @@ namespace Pizza
                 case Objective.getTrash:
                     GetNearestTrash(ai, mission);
                     break;
+                case Objective.dumpTrash:
+                    DumpTrash(ai, mission);
+                    break;
             }
             return;
         }
@@ -63,17 +66,11 @@ namespace Pizza
             Bb.Update(ai);
 
             BitArray targets = new BitArray(mission.m_targets());
-            BitArray passableOrTrash = Bb.GetPassable().Or(targets);
-            passableOrTrash.Set(Bb.GetOffset(fishPoint.X, fishPoint.Y), true);
+            BitArray passableOrTrash = Bb.GetPassable(fishPoint).Or(targets);
 
             while (availableCapacity > 0)
             {
-                Console.WriteLine("PassableOrTrash:");
-                Console.WriteLine(Bb.ToString(passableOrTrash, fishPoint));
-                Console.WriteLine("Targets:");
-                Console.WriteLine(Bb.ToString(targets));
                 var path = Pather.aStar(fishPoint, targets, passableOrTrash).ToArray();
-                Console.WriteLine("Goal:{0}", path[path.Length - 1]);
                 if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - 1)))
                 {
                     var trash = path[path.Length - 1];
@@ -94,6 +91,33 @@ namespace Pizza
             }
         }
 
+        public static void DumpTrash(AI ai, Mission mission)
+        {
+            Fish fish = mission.m_agent;
+            int weight = fish.CarryingWeight;
+            if (weight == 0)
+            {
+                return;
+            }
+
+            Point fishPoint = fish.Point();
+
+            Bb.Update(ai);
+
+            BitArray targets = new BitArray(mission.m_targets());
+            BitArray passable = Bb.GetPassable(fishPoint);
+
+            var path = Pather.aStar(fishPoint, targets, passable).ToArray();
+            if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - 1)))
+            {
+                var dump = path[path.Length - 1];
+                var tile = ai.getTile(dump.X, dump.Y);
+                Console.WriteLine("{0} picking up {1} at {2}", fish.Text(), weight, dump);
+                fish.drop(tile, weight);
+            }
+        }
+
+
         private static bool MoveAlong(Fish fish, IEnumerable<Point> path)
         {
             Point[] fullPath = path.ToArray();
@@ -108,7 +132,7 @@ namespace Pizza
             return fish.X == goal.X && fish.Y == goal.Y;
         }
 
-        public static IEnumerable<T> Range<T>(this IEnumerable<T> source, int start, int end)
+        private static IEnumerable<T> Range<T>(this IEnumerable<T> source, int start, int end)
         {
             return source.Where((s, i) => i >= start && i < end);
         }
