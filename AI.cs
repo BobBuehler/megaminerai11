@@ -218,7 +218,7 @@ class AI : BaseAI
 
     public bool specialsRequired()
     {
-        if (carryCount() == 0 && turnNumber() % seasonLength() < 43)
+        if (carryCount() < 2)
         {
             return true;
         }
