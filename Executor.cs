@@ -7,6 +7,11 @@ namespace Pizza
 {
     class Executor
     {
+        public static void Execute(AI ai, List<List<Mission>> missions)
+        {
+            missions.ForEach(ms => ms.ForEach(m => Execute(ai, m)));
+        }
+
         public static void Execute(AI ai, Mission mission)
         {
             switch(mission.m_obj)
