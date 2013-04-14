@@ -153,9 +153,6 @@ namespace Pizza
                     NeutralReef[GetOffset(tile.X, tile.Y)] = true;
                 }
             }
-            Console.WriteLine(Bb.ToString(OurReef));
-            Console.WriteLine(Bb.ToString(NeutralReef));
-            Console.WriteLine(Bb.ToString(TheirReef));
 
             //BaseAI.fishes.ToList().ForEach(fish => FishMap.Set(GetOffset(fish.X, fish.Y), true));
 
@@ -524,7 +521,7 @@ namespace Pizza
 
         public static void Set(BitArray board, Point point, bool value)
         {
-            board.Set(GetOffset(point.X, point.X), value);
+            board.Set(GetOffset(point.X, point.Y), value);
         }
 
         public static string ToString(BitArray board)
