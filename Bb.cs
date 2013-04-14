@@ -12,6 +12,58 @@ namespace Pizza
         public static int MaxY;
 
 
+        public static HashSet<Fish> OurStarfishSet = new HashSet<Fish>();
+        public static HashSet<Fish> OurSpongesSet = new HashSet<Fish>();
+        public static HashSet<Fish> OurAngelfishesSet = new HashSet<Fish>();
+        public static HashSet<Fish> OurSnailsSet = new HashSet<Fish>();
+        public static HashSet<Fish> OurUrchinsSet = new HashSet<Fish>();
+        public static HashSet<Fish> OurOctopiSet = new HashSet<Fish>();
+        public static HashSet<Fish> OurTomcodsSet = new HashSet<Fish>();
+        public static HashSet<Fish> OurSharksSet = new HashSet<Fish>();
+        public static HashSet<Fish> OurCuttlefishesSet = new HashSet<Fish>();
+        public static HashSet<Fish> OurShrimpsSet = new HashSet<Fish>();
+        public static HashSet<Fish> OurEelsSet = new HashSet<Fish>();
+        public static HashSet<Fish> OurJellyfishSet = new HashSet<Fish>();
+
+        public static HashSet<Fish> TheirStarfishSet = new HashSet<Fish>();
+        public static HashSet<Fish> TheirSpongesSet = new HashSet<Fish>();
+        public static HashSet<Fish> TheirAngelfishesSet = new HashSet<Fish>();
+        public static HashSet<Fish> TheirSnailsSet = new HashSet<Fish>();
+        public static HashSet<Fish> TheirUrchinsSet = new HashSet<Fish>();
+        public static HashSet<Fish> TheirOctopiSet = new HashSet<Fish>();
+        public static HashSet<Fish> TheirTomcodsSet = new HashSet<Fish>();
+        public static HashSet<Fish> TheirSharksSet = new HashSet<Fish>();
+        public static HashSet<Fish> TheirCuttlefishesSet = new HashSet<Fish>();
+        public static HashSet<Fish> TheirShrimpsSet = new HashSet<Fish>();
+        public static HashSet<Fish> TheirEelsSet = new HashSet<Fish>();
+        public static HashSet<Fish> TheirJellyfishSet = new HashSet<Fish>();
+
+        public static BitArray OurStarfishMap;
+        public static BitArray OurSpongesMap;
+        public static BitArray OurAngelfishesMap;
+        public static BitArray OurSnailsMap;
+        public static BitArray OurUrchinsMap;
+        public static BitArray OurOctopiMap;
+        public static BitArray OurTomcodsMap;
+        public static BitArray OurSharksMap;
+        public static BitArray OurCuttlefishesMap;
+        public static BitArray OurShrimpsMap;
+        public static BitArray OurEelsMap;
+        public static BitArray OurJellyfishMap;
+
+        public static BitArray TheirStarfishMap;
+        public static BitArray TheirSpongesMap;
+        public static BitArray TheirAngelfishesMap;
+        public static BitArray TheirSnailsMap;
+        public static BitArray TheirUrchinsMap;
+        public static BitArray TheirOctopiMap;
+        public static BitArray TheirTomcodsMap;
+        public static BitArray TheirSharksMap;
+        public static BitArray TheirCuttlefishesMap;
+        public static BitArray TheirShrimpsMap;
+        public static BitArray TheirEelsMap;
+        public static BitArray TheirJellyfishMap;
+
 
         public static HashSet<Tile> CoveSet = new HashSet<Tile>();
         public static HashSet<Tile> OurCoveSet = new HashSet<Tile>();
@@ -45,7 +97,6 @@ namespace Pizza
             TheirReef = new BitArray(AI.tiles.Length);
             NeutralReef = new BitArray(AI.tiles.Length);
 
-
             FishMap = new BitArray(AI.tiles.Length);
             OurFishMap = new BitArray(AI.tiles.Length);
             TheirFishMap = new BitArray(AI.tiles.Length);
@@ -59,6 +110,32 @@ namespace Pizza
             CoveMap = new BitArray(AI.tiles.Length);
             OurCoveMap = new BitArray(AI.tiles.Length);
             TheirCoveMap = new BitArray(AI.tiles.Length);
+
+            OurStarfishMap = new BitArray(AI.tiles.Length);
+            OurSpongesMap = new BitArray(AI.tiles.Length);
+            OurAngelfishesMap = new BitArray(AI.tiles.Length);
+            OurSnailsMap = new BitArray(AI.tiles.Length);
+            OurUrchinsMap = new BitArray(AI.tiles.Length);
+            OurOctopiMap = new BitArray(AI.tiles.Length);
+            OurTomcodsMap = new BitArray(AI.tiles.Length);
+            OurSharksMap = new BitArray(AI.tiles.Length);
+            OurCuttlefishesMap = new BitArray(AI.tiles.Length);
+            OurShrimpsMap = new BitArray(AI.tiles.Length);
+            OurEelsMap = new BitArray(AI.tiles.Length);
+            OurJellyfishMap = new BitArray(AI.tiles.Length);
+
+            TheirStarfishMap = new BitArray(AI.tiles.Length);
+            TheirSpongesMap = new BitArray(AI.tiles.Length);
+            TheirAngelfishesMap = new BitArray(AI.tiles.Length);
+            TheirSnailsMap = new BitArray(AI.tiles.Length);
+            TheirUrchinsMap = new BitArray(AI.tiles.Length);
+            TheirOctopiMap = new BitArray(AI.tiles.Length);
+            TheirTomcodsMap = new BitArray(AI.tiles.Length);
+            TheirSharksMap = new BitArray(AI.tiles.Length);
+            TheirCuttlefishesMap = new BitArray(AI.tiles.Length);
+            TheirShrimpsMap = new BitArray(AI.tiles.Length);
+            TheirEelsMap = new BitArray(AI.tiles.Length);
+            TheirJellyfishMap = new BitArray(AI.tiles.Length);
 
             //Fill Reef Maps
             foreach (var tile in BaseAI.tiles)
@@ -104,10 +181,112 @@ namespace Pizza
                 if (fish.Owner == ai.playerID())
                 {
                     OurFishMap[GetOffset(fish.X, fish.Y)] = true;
+                    switch (fish.Species)
+                    {
+                        case 0:
+                            OurStarfishMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurStarfishSet.Add(fish);
+                            break;
+                        case 1:
+                            OurSpongesMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurSpongesSet.Add(fish);
+                            break;
+                        case 2:
+                            OurAngelfishesMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurAngelfishesSet.Add(fish);
+                            break;
+                        case 3:
+                            OurSnailsMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurSnailsSet.Add(fish);
+                            break;
+                        case 4:
+                            OurUrchinsMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurUrchinsSet.Add(fish);
+                            break;
+                        case 5:
+                            OurOctopiMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurOctopiSet.Add(fish);
+                            break;
+                        case 6:
+                            OurTomcodsMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurTomcodsSet.Add(fish);
+                            break;
+                        case 7:
+                            OurSharksMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurSharksSet.Add(fish);
+                            break;
+                        case 8:
+                            OurCuttlefishesMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurCuttlefishesSet.Add(fish);
+                            break;
+                        case 9:
+                            OurShrimpsMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurShrimpsSet.Add(fish);
+                            break;
+                        case 10:
+                            OurEelsMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurEelsSet.Add(fish);
+                            break;
+                        case 11:
+                            OurJellyfishMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurJellyfishSet.Add(fish);
+                            break;
+                    }
                 }
                 else
                 {
                     TheirFishMap[GetOffset(fish.X, fish.Y)] = true;
+                    switch (fish.Species)
+                    {
+                        case 0:
+                            TheirStarfishMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirStarfishSet.Add(fish);
+                            break;
+                        case 1:
+                            TheirSpongesMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirSpongesSet.Add(fish);
+                            break;
+                        case 2:
+                            TheirAngelfishesMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirAngelfishesSet.Add(fish);
+                            break;
+                        case 3:
+                            TheirSnailsMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirSnailsSet.Add(fish);
+                            break;
+                        case 4:
+                            TheirUrchinsMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirUrchinsSet.Add(fish);
+                            break;
+                        case 5:
+                            TheirOctopiMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirOctopiSet.Add(fish);
+                            break;
+                        case 6:
+                            TheirTomcodsMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirTomcodsSet.Add(fish);
+                            break;
+                        case 7:
+                            TheirSharksMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirSharksSet.Add(fish);
+                            break;
+                        case 8:
+                            TheirCuttlefishesMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirCuttlefishesSet.Add(fish);
+                            break;
+                        case 9:
+                            TheirShrimpsMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirShrimpsSet.Add(fish);
+                            break;
+                        case 10:
+                            TheirEelsMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirEelsSet.Add(fish);
+                            break;
+                        case 11:
+                            TheirJellyfishMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirJellyfishSet.Add(fish);
+                            break;
+                    }
                 }
             }
 
@@ -147,6 +326,58 @@ namespace Pizza
 
         public static void Update(AI ai)
         {
+            OurStarfishMap.SetAll(false);
+            OurSpongesMap.SetAll(false);
+            OurAngelfishesMap.SetAll(false);
+            OurSnailsMap.SetAll(false);
+            OurUrchinsMap.SetAll(false);
+            OurOctopiMap.SetAll(false);
+            OurTomcodsMap.SetAll(false);
+            OurSharksMap.SetAll(false);
+            OurCuttlefishesMap.SetAll(false);
+            OurShrimpsMap.SetAll(false);
+            OurEelsMap.SetAll(false);
+            OurJellyfishMap.SetAll(false);
+
+            TheirStarfishMap.SetAll(false);
+            TheirSpongesMap.SetAll(false);
+            TheirAngelfishesMap.SetAll(false);
+            TheirSnailsMap.SetAll(false);
+            TheirUrchinsMap.SetAll(false);
+            TheirOctopiMap.SetAll(false);
+            TheirTomcodsMap.SetAll(false);
+            TheirSharksMap.SetAll(false);
+            TheirCuttlefishesMap.SetAll(false);
+            TheirShrimpsMap.SetAll(false);
+            TheirEelsMap.SetAll(false);
+            TheirJellyfishMap.SetAll(false);
+
+            OurStarfishSet.Clear();
+            OurSpongesSet.Clear();
+            OurAngelfishesSet.Clear();
+            OurSnailsSet.Clear();
+            OurUrchinsSet.Clear();
+            OurOctopiSet.Clear();
+            OurTomcodsSet.Clear();
+            OurSharksSet.Clear();
+            OurCuttlefishesSet.Clear();
+            OurShrimpsSet.Clear();
+            OurEelsSet.Clear();
+            OurJellyfishSet.Clear();
+
+            TheirStarfishSet.Clear();
+            TheirSpongesSet.Clear();
+            TheirAngelfishesSet.Clear();
+            TheirSnailsSet.Clear();
+            TheirUrchinsSet.Clear();
+            TheirOctopiSet.Clear();
+            TheirTomcodsSet.Clear();
+            TheirSharksSet.Clear();
+            TheirCuttlefishesSet.Clear();
+            TheirShrimpsSet.Clear();
+            TheirEelsSet.Clear();
+            TheirJellyfishSet.Clear();
+
             FishMap.SetAll(false);
             TheirFishMap.SetAll(false);
             OurFishMap.SetAll(false);
@@ -162,10 +393,112 @@ namespace Pizza
                 if (fish.Owner == ai.playerID())
                 {
                     OurFishMap[GetOffset(fish.X, fish.Y)] = true;
+                    switch (fish.Species)
+                    {
+                        case 0:
+                            OurStarfishMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurStarfishSet.Add(fish);
+                            break;
+                        case 1:
+                            OurSpongesMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurSpongesSet.Add(fish);
+                            break;
+                        case 2:
+                            OurAngelfishesMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurAngelfishesSet.Add(fish);
+                            break;
+                        case 3:
+                            OurSnailsMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurSnailsSet.Add(fish);
+                            break;
+                        case 4:
+                            OurUrchinsMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurUrchinsSet.Add(fish);
+                            break;
+                        case 5:
+                            OurOctopiMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurOctopiSet.Add(fish);
+                            break;
+                        case 6:
+                            OurTomcodsMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurTomcodsSet.Add(fish);
+                            break;
+                        case 7:
+                            OurSharksMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurSharksSet.Add(fish);
+                            break;
+                        case 8:
+                            OurCuttlefishesMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurCuttlefishesSet.Add(fish);
+                            break;
+                        case 9:
+                            OurShrimpsMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurShrimpsSet.Add(fish);
+                            break;
+                        case 10:
+                            OurEelsMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurEelsSet.Add(fish);
+                            break;
+                        case 11:
+                            OurJellyfishMap[GetOffset(fish.X, fish.Y)] = true;
+                            OurJellyfishSet.Add(fish);
+                            break;
+                    }
                 }
                 else
                 {
                     TheirFishMap[GetOffset(fish.X, fish.Y)] = true;
+                    switch (fish.Species)
+                    {
+                        case 0:
+                            TheirStarfishMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirStarfishSet.Add(fish);
+                            break;
+                        case 1:
+                            TheirSpongesMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirSpongesSet.Add(fish);
+                            break;
+                        case 2:
+                            TheirAngelfishesMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirAngelfishesSet.Add(fish);
+                            break;
+                        case 3:
+                            TheirSnailsMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirSnailsSet.Add(fish);
+                            break;
+                        case 4:
+                            TheirUrchinsMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirUrchinsSet.Add(fish);
+                            break;
+                        case 5:
+                            TheirOctopiMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirOctopiSet.Add(fish);
+                            break;
+                        case 6:
+                            TheirTomcodsMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirTomcodsSet.Add(fish);
+                            break;
+                        case 7:
+                            TheirSharksMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirSharksSet.Add(fish);
+                            break;
+                        case 8:
+                            TheirCuttlefishesMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirCuttlefishesSet.Add(fish);
+                            break;
+                        case 9:
+                            TheirShrimpsMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirShrimpsSet.Add(fish);
+                            break;
+                        case 10:
+                            TheirEelsMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirEelsSet.Add(fish);
+                            break;
+                        case 11:
+                            TheirJellyfishMap[GetOffset(fish.X, fish.Y)] = true;
+                            TheirJellyfishSet.Add(fish);
+                            break;
+                    }
                 }
             }
 
@@ -178,7 +511,7 @@ namespace Pizza
                 }
             }
 
-            OurTrashMap = new BitArray(TrashMap).And(OurReef);
+            OurTrashMap = new BitArray(TrashMap).And(OurReef);  
             TheirTrashMap = new BitArray(TrashMap).And(TheirReef);
         }
 
