@@ -35,24 +35,13 @@ class AI : BaseAI
                                                         SpeciesIndex.JELLYFISH,
                                                         SpeciesIndex.SPONGE,
                                                         SpeciesIndex.REEF_SHARK,
+                                                        SpeciesIndex.CONESHELL_SNAIL,
                                                         SpeciesIndex.SEA_URCHIN,
-                                                        SpeciesIndex.OCTOPUS,
-                                                        SpeciesIndex.CLEANER_SHRIMP };
-
-    //HashSet<Fish> starfish = new HashSet<Fish>();
-    //HashSet<Fish> sponges = new HashSet<Fish>();
-    //HashSet<Fish> angelfishes = new HashSet<Fish>();
-    //HashSet<Fish> snails = new HashSet<Fish>();
-    //HashSet<Fish> urchins = new HashSet<Fish>();
-    //HashSet<Fish> octopi = new HashSet<Fish>();
-    //HashSet<Fish> tomcods = new HashSet<Fish>();
-    //HashSet<Fish> sharks = new HashSet<Fish>();
-    //HashSet<Fish> cuttlefishes = new HashSet<Fish>();
-    //HashSet<Fish> shrimps = new HashSet<Fish>();
-    //HashSet<Fish> eels = new HashSet<Fish>();
-    //HashSet<Fish> jellyfish = new HashSet<Fish>();
+                                                        SpeciesIndex.OCTOPUS };
 
     List<List<Mission>> missions = new List<List<Mission>>();
+    Func<BitArray> ourTrash = () => Bb.OurReef;
+    //Func<BitArray> ourTrash = () => (Bb.OurReef.Or(Bb.NeutralReef));
 
     /// <summary>
     /// Returns your username.
@@ -147,26 +136,94 @@ class AI : BaseAI
     //############################ our code ######################################
     public void spawn()
     {
-        // Iterate across all tiles.
-        foreach (Tile tile in Bb.OurCoveSet)
+        if (!saveMoney())
         {
-            // If the tile is yours, is not spawning a fish, and has no fish on it...
-            if (tile.HasEgg == 0 && getFish(tile.X, tile.Y) == null)
+            // Iterate across all tiles.
+            foreach (Tile tile in Bb.OurCoveSet) //todo: order coves in order of closeness
             {
-                // ...iterate across all species.
-                for (int i = 0; i < preferedSpeciesList.Length; i++)
+                // If the tile is yours, is not spawning a fish, and has no fish on it...
+                if (tile.HasEgg == 0 && getFish(tile.X, tile.Y) == null)
                 {
-                    // If the species is in season and we can afford it...
-                    Species s = speciesList[(int)preferedSpeciesList[i]];
-                    if (s.Season == currentSeason() && players[playerID()].SpawnFood >= s.Cost)
-                    {
-                        // ...spawn it and break (can't spawn multiple fish on the same cove).
-                        s.spawn(tile);
-                        break;
+                    List<Species> ps = calcPreferedSpecies();
+                    foreach(Species s in ps){
+                        if (s.Season == currentSeason() && players[playerID()].SpawnFood >= s.Cost)
+                        {
+                            // ...spawn it and break (can't spawn multiple fish on the same cove).
+                            s.spawn(tile);
+                            break;
+                        }
                     }
                 }
             }
         }
+    }
+
+    public List<Species> calcPreferedSpecies()
+    {
+        List<Species> preflist = new List<Species>();
+
+        for (int i = 0; i < preferedSpeciesList.Length; i++)
+        {
+            Species s = speciesList[(int)preferedSpeciesList[i]];
+            if (s.Season == currentSeason())
+            {
+                preflist.Add(s);
+            }
+        }
+        return preflist;
+    }
+
+    public bool saveMoney()
+    {
+        if (turnNumber() < 455 && turnNumber() % seasonLength() < 21 && getNextSelectionPriority() > getThisSeasonPriority())
+        {
+            return true;
+        }
+        return false;
+    }
+    public int getThisSeasonPriority()
+    {
+        try
+        {
+            List<Species> ps = calcPreferedSpecies();
+            for (int i = 0; i < ps.Count; i++)
+            {
+                if (ps[i].Season == currentSeason())
+                {
+                    return i;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        return 12;
+    }
+
+    public int getNextSelectionPriority()
+    {
+        try
+        {
+            int nextSeason = currentSeason() + 1;
+            if (nextSeason == 4)
+            {
+                nextSeason = 0;
+            }
+            List<Species> ps = calcPreferedSpecies();
+            for (int i = 0; i < ps.Count; i++)
+            {
+                if (ps[i].Season == nextSeason)
+                {
+                    return i;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        return 13;
     }
 
     public void goNearAndDoSomething(Fish fish, BitArray want, Action<Tile> something)
@@ -226,7 +283,7 @@ class AI : BaseAI
         {
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.goTo, () => Bb.TheirReef));
-            mission.Add(new Mission(f, Objective.surviveWithInTarget, () => Bb.TheirReef, false));
+            mission.Add(new Mission(f, Objective.surviveWithInTarget, ourTrash, false));
             missions.Add(mission);
         }
     }
@@ -236,8 +293,11 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurSpongesMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurTrashMap));
+            mission.Add(new Mission(f, Objective.getTrash, ourTrash));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.getTrash, ourTrash));
+            mission.Add(new Mission(f, Objective.dontsuicide, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
         }
     }
@@ -247,8 +307,12 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurAngelfishesMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurTrashMap));
+            mission.Add(new Mission(f, Objective.getTrash, ourTrash));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));//todo: change their reef to their coves/dump far
+            mission.Add(new Mission(f, Objective.getTrash, ourTrash));
+            mission.Add(new Mission(f, Objective.dontsuicide, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
+
             missions.Add(mission);
         }
     }
@@ -258,7 +322,7 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurSnailsMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap)),true));//todo:snails protect our borders?
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap)), true));//todo:snails protect our borders?
             mission.Add(new Mission(f, Objective.goTo, () => Bb.TheirCoveMap));//todo:broken
             mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
@@ -269,7 +333,7 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurUrchinsMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap)),true));
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap)), true));
             mission.Add(new Mission(f, Objective.goTo, () => Bb.TheirCoveMap));//todo:broken
             mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
@@ -280,7 +344,7 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurOctopiMap)
         {
             List<Mission> mission = new List<Mission>();//todo: camp center?
-            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap)),true));//todo: implement multiple attacks
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap)), true));//todo: implement multiple attacks
             mission.Add(new Mission(f, Objective.goTo, () => Bb.TheirCoveMap));//todo:broken
             mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
@@ -291,8 +355,9 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurTomcodsMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurTrashMap));//todo:dump at coves/far
+            mission.Add(new Mission(f, Objective.getTrash, ourTrash));//todo:dump at coves/far
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.getTrash, ourTrash));
             missions.Add(mission);
         }
     }
@@ -301,29 +366,29 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurSharksMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
+            mission.Add(new Mission(f, Objective.attackTarget, () => Bb.TheirFishMap));
             missions.Add(mission);
         }
     }
     public void assignCuttleFishes()
     {
-        foreach (Fish f in Bb.OurFishMap)
+        foreach (Fish f in Bb.OurCuttlefishesMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurTrashMap));
-
-            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.attackTarget, () => Bb.TheirStarfishMap));//todo:attack stars first??
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
         }
     }
+
     public void assignShrimp()
     {
         foreach (Fish f in Bb.OurShrimpsMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurTrashMap));
-
+            mission.Add(new Mission(f, Objective.getTrash, ourTrash));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.attackTarget, () => Bb.OurFishMap));
             missions.Add(mission);
         }
     }
@@ -332,9 +397,7 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurEelsMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurTrashMap));
-
-            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
         }
     }
@@ -342,13 +405,12 @@ class AI : BaseAI
     {
         foreach (Fish f in Bb.OurJellyfishMap)
         {
-            List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurTrashMap));
-
-            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
+            List<Mission> mission = new List<Mission>();//todo: camp center?
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap)), true));
+            mission.Add(new Mission(f, Objective.goTo, () => Bb.TheirCoveMap));//todo:broken
+            mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
         }
     }
-
     //##################################################################
 }

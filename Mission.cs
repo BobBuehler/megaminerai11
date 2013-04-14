@@ -12,7 +12,8 @@ namespace Pizza
         getTrash,
         dumpTrash,
         surviveWithInTarget,
-        attackTarget
+        attackTarget,
+        dontsuicide
     };
 
     class Mission
