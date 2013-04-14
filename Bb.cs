@@ -72,6 +72,8 @@ namespace Pizza
         public static BitArray OurReef;
         public static BitArray TheirReef;
         public static BitArray NeutralReef;
+        public static BitArray OurDeepestReef;
+        public static BitArray TheirDeepestReef;
 
         public static BitArray FishMap;
         public static BitArray OurFishMap;
@@ -87,7 +89,7 @@ namespace Pizza
         public static BitArray CoveMap;
         public static BitArray TheirCoveMap;
 
-        public static BitArray UnMappable;
+
 
         public static void init(AI ai)
         {
@@ -155,6 +157,34 @@ namespace Pizza
                 else
                 {
                     NeutralReef[GetOffset(tile.X, tile.Y)] = true;
+                }
+            }
+            if (BaseAI.tiles[GetOffset(MaxX, 0)].Damages == ai.playerID())
+            {
+                foreach (Tile t in BaseAI.tiles)
+                {
+                    if (t.X == MaxX - 1 || t.X == MaxX - 2)
+                    {
+                        OurDeepestReef[GetOffset(t.X, t.Y)] = true;
+                    }
+                    else if (t.X == 0 || t.X == 1)
+                    {
+                        TheirDeepestReef[GetOffset(t.X, t.Y)] = true;
+                    }
+                }
+            }
+            else
+            {
+                foreach (Tile t in BaseAI.tiles)
+                {
+                    if (t.X == MaxX - 1 || t.X == MaxX - 2)
+                    {
+                        TheirDeepestReef[GetOffset(t.X, t.Y)] = true;
+                    }
+                    else if (t.X == 0 || t.X == 1)
+                    {
+                        OurDeepestReef[GetOffset(t.X, t.Y)] = true;
+                    }
                 }
             }
 
