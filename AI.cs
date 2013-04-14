@@ -295,7 +295,7 @@ class AI : BaseAI
 
     public void assignSponges()
     {
-        foreach (Fish f in Bb.OurSpongesMap)
+        foreach (Fish f in Bb.OurSpongesSet)
         {
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
@@ -309,7 +309,7 @@ class AI : BaseAI
 
     public void assignAngelfishes()
     {
-        foreach (Fish f in Bb.OurAngelfishesMap)
+        foreach (Fish f in Bb.OurAngelfishesSet)
         {
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
@@ -324,7 +324,7 @@ class AI : BaseAI
 
     public void assignSnails()
     {
-        foreach (Fish f in Bb.OurSnailsMap)
+        foreach (Fish f in Bb.OurSnailsSet)
         {
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap)), true));//todo:snails protect our borders?
@@ -335,7 +335,7 @@ class AI : BaseAI
     }
     public void assignUrchins()
     {
-        foreach (Fish f in Bb.OurUrchinsMap)
+        foreach (Fish f in Bb.OurUrchinsSet)
         {
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap)), true));
@@ -346,7 +346,7 @@ class AI : BaseAI
     }
     public void assignOctopi()
     {
-        foreach (Fish f in Bb.OurOctopiMap)
+        foreach (Fish f in Bb.OurOctopiSet)
         {
             List<Mission> mission = new List<Mission>();//todo: camp center?
             mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap)), true));//todo: implement multiple attacks
@@ -357,7 +357,7 @@ class AI : BaseAI
     }
     public void assignTomcods()
     {
-        foreach (Fish f in Bb.OurTomcodsMap)
+        foreach (Fish f in Bb.OurTomcodsSet)
         {
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));//todo:dump at coves/far
@@ -368,7 +368,7 @@ class AI : BaseAI
     }
     public void assignSharks()
     {
-        foreach (Fish f in Bb.OurSharksMap)
+        foreach (Fish f in Bb.OurSharksSet)
         {
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.attackTarget, () => Bb.TheirFishMap));
@@ -377,7 +377,7 @@ class AI : BaseAI
     }
     public void assignCuttleFishes()
     {
-        foreach (Fish f in Bb.OurCuttlefishesMap)
+        foreach (Fish f in Bb.OurCuttlefishesSet)
         {
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.attackTarget, () => Bb.TheirStarfishMap));//todo:attack stars first??
@@ -388,7 +388,7 @@ class AI : BaseAI
 
     public void assignShrimp()
     {
-        foreach (Fish f in Bb.OurShrimpsMap)
+        foreach (Fish f in Bb.OurShrimpsSet)
         {
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
@@ -399,7 +399,7 @@ class AI : BaseAI
     }
     public void assignEels()
     {
-        foreach (Fish f in Bb.OurEelsMap)
+        foreach (Fish f in Bb.OurEelsSet)
         {
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
@@ -408,7 +408,7 @@ class AI : BaseAI
     }
     public void assignJellyFishes()
     {
-        foreach (Fish f in Bb.OurJellyfishMap)
+        foreach (Fish f in Bb.OurJellyfishSet)
         {
             List<Mission> mission = new List<Mission>();//todo: camp center?
             mission.Add(new Mission(f, Objective.attackTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap)), true));
