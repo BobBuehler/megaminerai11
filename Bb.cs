@@ -6,7 +6,7 @@ using System.Collections;
 
 namespace Pizza
 {
-    static class Bb.FishMapBb.FishMapBb
+    static class Bb
     {
         public static int MaxX;
         public static int MaxY;
