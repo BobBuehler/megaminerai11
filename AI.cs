@@ -41,18 +41,18 @@ class AI : BaseAI
                                                         SpeciesIndex.ELECTRIC_EEL,
                                                         SpeciesIndex.CLEANER_SHRIMP };
 
-    HashSet<Fish> starfish = new HashSet<Fish>();
-    HashSet<Fish> sponges = new HashSet<Fish>();
-    HashSet<Fish> angelfishes = new HashSet<Fish>();
-    HashSet<Fish> snails = new HashSet<Fish>();
-    HashSet<Fish> urchins = new HashSet<Fish>();
-    HashSet<Fish> octopi = new HashSet<Fish>();
-    HashSet<Fish> tomcods = new HashSet<Fish>();
-    HashSet<Fish> sharks = new HashSet<Fish>();
-    HashSet<Fish> cuttlefishes = new HashSet<Fish>();
-    HashSet<Fish> shrimps = new HashSet<Fish>();
-    HashSet<Fish> eels = new HashSet<Fish>();
-    HashSet<Fish> jellyfish = new HashSet<Fish>();
+    //HashSet<Fish> starfish = new HashSet<Fish>();
+    //HashSet<Fish> sponges = new HashSet<Fish>();
+    //HashSet<Fish> angelfishes = new HashSet<Fish>();
+    //HashSet<Fish> snails = new HashSet<Fish>();
+    //HashSet<Fish> urchins = new HashSet<Fish>();
+    //HashSet<Fish> octopi = new HashSet<Fish>();
+    //HashSet<Fish> tomcods = new HashSet<Fish>();
+    //HashSet<Fish> sharks = new HashSet<Fish>();
+    //HashSet<Fish> cuttlefishes = new HashSet<Fish>();
+    //HashSet<Fish> shrimps = new HashSet<Fish>();
+    //HashSet<Fish> eels = new HashSet<Fish>();
+    //HashSet<Fish> jellyfish = new HashSet<Fish>();
 
     List<Mission> missions = new List<Mission>();
 
@@ -237,10 +237,13 @@ class AI : BaseAI
 
     public void assignStarfish()
     {
-        foreach (Fish f in starfish)
+        foreach (Fish f in Bb.OurStarfishSet)
         {
             missions.Add(new Mission(f, Objective.goTo, Bb.TheirReef));
-            missions.Add(new Mission(f,Objective.dodgeInReef,Bb.TheirReef));
+            if (f.MovementLeft > 0)
+            {
+                missions.Add(new Mission(f, Objective.dodgeInReef, Bb.TheirReef,false));
+            }
         }
     }
 
