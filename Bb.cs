@@ -87,6 +87,8 @@ namespace Pizza
         public static BitArray CoveMap;
         public static BitArray TheirCoveMap;
 
+        public static BitArray UnMappable;
+
         public static void init(AI ai)
         {
             MaxX = ai.mapWidth();
@@ -137,6 +139,8 @@ namespace Pizza
             TheirEelsMap = new BitArray(AI.tiles.Length);
             TheirJellyfishMap = new BitArray(AI.tiles.Length);
 
+            
+            
             //Fill Reef Maps
             foreach (var tile in BaseAI.tiles)
             {
@@ -493,8 +497,86 @@ namespace Pizza
                 }
             }
 
-            OurTrashMap = new BitArray(TrashMap).And(OurReef);  
+            OurTrashMap = new BitArray(TrashMap).And(OurReef);
             TheirTrashMap = new BitArray(TrashMap).And(TheirReef);
+        }
+
+
+        public static BitArray GetNAwayFromPoint(int n, Point point)
+        {
+            BitArray nAwayFromPoint = new BitArray(AI.tiles.Length);
+            int x = point.X;
+            int y = point.Y;
+
+
+            for (int i = 1; i <= n; i++)
+            {
+                if (y + i < MaxY)
+                {
+                    nAwayFromPoint[GetOffset(x, y + i)] = true;
+                }
+                if (y - i >= 0)
+                {
+                    nAwayFromPoint[GetOffset(x, y - i)] = true;
+                }
+                if (x + i < MaxX)
+                {
+                    nAwayFromPoint[GetOffset(x + i, y)] = true;
+                }
+                if (x - i >= 0)
+                {
+                    nAwayFromPoint[GetOffset(x - i, y)] = true;
+                }
+
+                for (int j = 1; j <= i - 1; j++)
+                {
+                    if (x + j < MaxX && y + i - j < MaxY && y + i - j >= 0)
+                    {
+                        nAwayFromPoint[GetOffset(x + j, y + i - j)] = true;
+                    }
+                    if (x - j >= 0 && y + i - j < MaxY && y + i - j >= 0)
+                    {
+                        nAwayFromPoint[GetOffset(x - j, y + i - j)] = true;
+                    }
+                    if (x + j < MaxX && y - i + j < MaxY && y - i + j >= 0)
+                    {
+                        nAwayFromPoint[GetOffset(x + j, y - i + j)] = true;
+                    }
+                    if (x - j >= 0 && y - i + j < MaxY && y - i + j >= 0)
+                    {
+                        nAwayFromPoint[GetOffset(x - j, y - i + j)] = true;
+                    }
+                }
+            }
+
+            return nAwayFromPoint;
+        }
+
+        public static BitArray GetNAwayFromPointMovable(int n, Point point)
+        {
+            int x = point.X;
+            int y = point.Y;
+            BitArray nAwayFromPointMovable = new BitArray(AI.tiles.Length);
+
+
+
+
+
+            return nAwayFromPointMovable;
+        }
+
+        public static bool IsReachable(Point origin, Point destination, BitArray bB)
+        {
+            Queue<Point> Q = new Queue<Point>();
+            HashSet<Point> Visited = new HashSet<Point>();
+
+            Q.Enqueue(origin);
+            while (Q.Count > 0)
+            {
+                Point current = Q.Dequeue();
+            }
+
+            return true;
         }
 
         public static BitArray GetPassable()
