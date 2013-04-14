@@ -21,28 +21,11 @@ namespace Pizza
     class Mission
     {
         public Fish m_agent;
-        //Point m_dest;
-        public BitArray m_targets;
+        public Func<BitArray> m_targets;
         public Objective m_obj;
         public bool m_attackAlongTheWay;
 
-
-        public Mission(Fish Agent)
-        {
-            m_agent = Agent;
-            m_obj = Objective.goTo;
-            m_attackAlongTheWay = true;
-        }
-
-        public Mission(Fish Agent, Objective Obj,  BitArray Targets)
-        {
-            m_agent = Agent;
-            m_obj = Obj;
-            m_targets = Targets;
-            m_attackAlongTheWay = true;
-        }
-
-        public Mission(Fish Agent, Objective Obj, BitArray Targets, bool AttackAlongTheWay)
+        public Mission(Fish Agent, Objective Obj, Func<BitArray> Targets, bool AttackAlongTheWay = true)
         {
             m_agent = Agent;
             m_obj = Obj;
