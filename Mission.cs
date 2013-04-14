@@ -12,6 +12,7 @@ namespace Pizza
         getNearestTrash,
         dumpTrashClose,
         dumpTrashFar,
+        dumpTrashCove,
         dodgeInReef,
         killTarget
     };
