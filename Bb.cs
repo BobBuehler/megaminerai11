@@ -650,6 +650,13 @@ namespace Pizza
             board.Set(GetOffset(point.X, point.Y), value);
         }
 
+        public static BitArray ToBitArray(IEnumerable<Mappable> mappables)
+        {
+            BitArray board = new BitArray(MaxX * MaxY);
+            mappables.ForEach(m => board.Set(GetOffset(m.X, m.Y), true));
+            return board;
+        }
+
         public static List<Point> BitArrayToList(BitArray bB)
         {
             List<Point> trues = new List<Point>();

@@ -10,6 +10,7 @@ namespace Pizza
     {
         public static void Execute(AI ai, List<List<Mission>> missions)
         {
+            NewTurn();
             missions.ForEach(ms => ms.ForEach(m => Execute(ai, m)));
         }
 
@@ -138,19 +139,54 @@ namespace Pizza
 
             int range = fish.Range;
 
-            Bb.Update(ai);
+            HashSet<Fish> previousTargets = GetAlreadyAttacked(fish);
 
-            Point fishPoint = fish.Point();
-            BitArray passableOrTheirFish = Bb.GetPassable(fishPoint).Or(Bb.TheirFishMap);
-            BitArray targetsInTheirFish = new BitArray(mission.m_targets()).And(Bb.TheirFishMap);
-
-            var path = Pather.aStar(fishPoint, targetsInTheirFish, passableOrTheirFish).ToArray();
-            if (path.Length > 1)
+            while (fish.AttacksLeft > 0)
             {
-                 MoveAlong(fish, path.Range(0, path.Length - range), true);
+                Bb.Update(ai);
+
+                Point fishPoint = fish.Point();
+                BitArray dontAttack = Bb.ToBitArray(previousTargets);
+                BitArray attackable = new BitArray(dontAttack).Not().And(Bb.TheirFishMap);
+                BitArray targetsInAttackable = new BitArray(mission.m_targets()).And(attackable);
+                BitArray passableOrTargetInAttackable = Bb.GetPassable(fishPoint).Or(targetsInAttackable);
+
+                var path = Pather.aStar(fishPoint, targetsInAttackable, passableOrTargetInAttackable).ToArray();
+                if (path.Length > 1)
+                {
+                    MoveAlong(fish, path.Range(0, path.Length - range), true);
+                }
+                if (fish.MovementLeft == 0)
+                {
+                    return;
+                }
             }
         }
 
+        private static Dictionary<Fish, HashSet<Fish>> alreadyAttacked = new Dictionary<Fish, HashSet<Fish>>();
+        public static void NewTurn()
+        {
+            alreadyAttacked.Clear();
+        }
+
+        private static HashSet<Fish> GetAlreadyAttacked(Fish agent)
+        {
+            HashSet<Fish> previousTargets;
+            if (!alreadyAttacked.TryGetValue(agent, out previousTargets))
+            {
+                previousTargets = new HashSet<Fish>();
+                alreadyAttacked.Add(agent, previousTargets);
+            }
+            return previousTargets;
+        }
+
+        private static void Attack(Fish agent, Fish target)
+        {
+            if (GetAlreadyAttacked(agent).Add(target))
+            {
+                agent.attack(target);
+            }
+        }
 
         private static bool MoveAlong(Fish fish, IEnumerable<Point> path, bool attackAlongTheWay)
         {
@@ -160,7 +196,7 @@ namespace Pizza
                 return true;
             }
 
-            var attacks = new Dictionary<Point,IEnumerable<Fish>>();
+            var attacks = new Dictionary<Point, IEnumerable<Fish>>();
             if (attackAlongTheWay)
             {
                 attacks = targetsEnRoute(fish, path);
@@ -203,7 +239,7 @@ namespace Pizza
 
             var distinct = new HashSet<Fish>();
             var distinctTargets = allTargets.Where(pt => distinct.Add(pt.t)).ToArray();
-            
+
             var bests = new HashSet<Fish>();
             while (attacks > bests.Count && distinct.Any())
             {
@@ -222,7 +258,7 @@ namespace Pizza
             return source.Where((s, i) => i >= start && i < end);
         }
 
-        private static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
+        public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {
             foreach (var s in source)
             {
