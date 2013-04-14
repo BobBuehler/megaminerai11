@@ -250,7 +250,7 @@ class AI : BaseAI
         if (!saveMoney())
         {
             // Iterate across all tiles.
-            foreach (Tile tile in Bb.OurCoveSet) //todo: order coves in order of closeness
+            foreach (Tile tile in OrderedOurCoveSet) //todo: order coves in order of closeness
             {
                 // If the tile is yours, is not spawning a fish, and has no fish on it...
                 if (tile.HasEgg == 0 && getFish(tile.X, tile.Y) == null)
