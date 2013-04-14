@@ -154,7 +154,16 @@ namespace Pizza
                 var path = Pather.aStar(fishPoint, targetsInAttackable, passableOrTargetInAttackable).ToArray();
                 if (path.Length > 1)
                 {
+                    int attacks = fish.AttacksLeft;
                     MoveAlong(fish, path.Range(0, path.Length - range), true);
+                    if (fish.AttacksLeft == attacks)
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    return;
                 }
                 if (fish.MovementLeft == 0)
                 {
