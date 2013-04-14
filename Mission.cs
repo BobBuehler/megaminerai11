@@ -8,14 +8,13 @@ namespace Pizza
 {
     enum Objective
     {
-        goTo,
-        goNextTo,
-        getNearestTrash,
-        dumpTrashClose,
-        dumpTrashFar,
-        dumpTrashCove,
-        dodgeInReef,
-        killClosestTarget
+        goTo,//ie: Bb.OurReef
+        goNextTo,//ie: Bb.TheirCoveMap
+        getNearestTrash,//ie: Bb.OurReef
+        dumpTrash,//ie: Bb.TheirReef
+        dodge,// bounds i want the fish to dodge in  ie:Bb.TheirReef 
+        killClosestTarget,//ie: Bb.TheirFishMap
+        attackIfInRange//ie: Bb.TheirFishMap
     };
 
     class Mission

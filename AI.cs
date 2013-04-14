@@ -222,7 +222,7 @@ class AI : BaseAI
         {
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.goTo, () => Bb.TheirReef));
-            mission.Add(new Mission(f, Objective.dodgeInReef, () => Bb.TheirReef, false));
+            mission.Add(new Mission(f, Objective.dodge, () => Bb.TheirReef, false));
             missions.Add(mission);
         }
     }
@@ -233,7 +233,7 @@ class AI : BaseAI
         {
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getNearestTrash, () => Bb.OurTrashMap));
-            mission.Add(new Mission(f, Objective.dumpTrashClose, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
             missions.Add(mission);
         }
     }
@@ -244,8 +244,7 @@ class AI : BaseAI
         {
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getNearestTrash, () => Bb.OurTrashMap));
-
-            mission.Add(new Mission(f, Objective.dumpTrashClose, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));//todo: change their reef to their coves/dump far
             missions.Add(mission);
         }
     }
@@ -255,9 +254,9 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurSnailsMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.getNearestTrash, () => Bb.OurTrashMap));
-
-            mission.Add(new Mission(f, Objective.dumpTrashClose, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.attackIfInRange, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));//todo:snails protect our borders?
+            mission.Add(new Mission(f, Objective.goNextTo, () => Bb.TheirCoveMap));
+            mission.Add(new Mission(f, Objective.killClosestTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
         }
     }
@@ -266,9 +265,9 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurUrchinsMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.getNearestTrash, () => Bb.OurTrashMap));
-
-            mission.Add(new Mission(f, Objective.dumpTrashClose, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.attackIfInRange, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
+            mission.Add(new Mission(f, Objective.goNextTo, () => Bb.TheirCoveMap));
+            mission.Add(new Mission(f, Objective.killClosestTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
         }
     }
@@ -277,9 +276,9 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurOctopiMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.getNearestTrash, () => Bb.OurTrashMap));
-
-            mission.Add(new Mission(f, Objective.dumpTrashClose, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.attackIfInRange, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));//todo: camp center?
+            mission.Add(new Mission(f, Objective.goNextTo, () => Bb.TheirCoveMap));
+            mission.Add(new Mission(f, Objective.killClosestTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
         }
     }
@@ -289,7 +288,7 @@ class AI : BaseAI
         {
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getNearestTrash, () => Bb.OurTrashMap));
-            mission.Add(new Mission(f, Objective.dumpTrashClose, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
             missions.Add(mission);
         }
     }
@@ -298,9 +297,7 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurSharksMap)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.getNearestTrash, () => Bb.OurTrashMap));
-
-            mission.Add(new Mission(f, Objective.dumpTrashClose, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.killClosestTarget, () => (Bb.TheirFishMap.Xor(Bb.TheirUrchinsMap))));
             missions.Add(mission);
         }
     }
@@ -311,7 +308,7 @@ class AI : BaseAI
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getNearestTrash, () => Bb.OurTrashMap));
 
-            mission.Add(new Mission(f, Objective.dumpTrashClose, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
             missions.Add(mission);
         }
     }
@@ -322,7 +319,7 @@ class AI : BaseAI
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getNearestTrash, () => Bb.OurTrashMap));
 
-            mission.Add(new Mission(f, Objective.dumpTrashClose, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
             missions.Add(mission);
         }
     }
@@ -333,7 +330,7 @@ class AI : BaseAI
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getNearestTrash, () => Bb.OurTrashMap));
 
-            mission.Add(new Mission(f, Objective.dumpTrashClose, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
             missions.Add(mission);
         }
     }
@@ -344,7 +341,7 @@ class AI : BaseAI
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getNearestTrash, () => Bb.OurTrashMap));
 
-            mission.Add(new Mission(f, Objective.dumpTrashClose, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
             missions.Add(mission);
         }
     }
