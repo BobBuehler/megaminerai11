@@ -467,7 +467,7 @@ class AI : BaseAI
             List<Mission> mission = new List<Mission>();
             mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
-            mission.Add(new Mission(f, Objective.coverWithTrash, () => Bb.TheirReef));//todo: change their reef to their coves??
+            mission.Add(new Mission(f, Objective.coverWithTrash, () => Bb.TheirReef,true));//todo: change their reef to their coves??
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));//todo: change their reef to their coves??
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.NeutralReef));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
