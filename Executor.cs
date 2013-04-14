@@ -217,7 +217,7 @@ namespace Pizza
                 {
                     attacks[moveTo].ForEach(target =>
                     {
-                        fish.attack(target);
+                        Attack(fish, target);
                     });
                 }
             }
@@ -235,10 +235,14 @@ namespace Pizza
             var allPoints = new List<Point>(path);
             allPoints.Add(fish.Point());
 
-            var allTargets = allPoints.SelectMany(p => Picker.GetTargets(range, p, enemy).Select(t => new { p = p, t = t }));
+            var allTargets = allPoints.SelectMany(
+                p => Picker.GetTargets(range, p, enemy)
+                    .Select(t => new { p = p, t = t }));
 
+            HashSet<Fish> previousTargets = GetAlreadyAttacked(fish);
             var distinct = new HashSet<Fish>();
-            var distinctTargets = allTargets.Where(pt => distinct.Add(pt.t)).ToArray();
+            var distinctTargets = allTargets
+                .Where(pt => !previousTargets.Contains(pt.t) && distinct.Add(pt.t)).ToArray();
 
             var bests = new HashSet<Fish>();
             while (attacks > bests.Count && distinct.Any())
