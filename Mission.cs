@@ -9,11 +9,13 @@ namespace Pizza
     enum Objective
     {
         goTo,
+        goNextTo,
         getNearestTrash,
         dumpTrashClose,
         dumpTrashFar,
+        dumpTrashCove,
         dodgeInReef,
-        killTarget
+        killClosestTarget
     };
 
     class Mission
