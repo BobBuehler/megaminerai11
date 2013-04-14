@@ -15,6 +15,12 @@ namespace Pizza
 
         public static void Execute(AI ai, Mission mission)
         {
+            if (mission.m_agent.CurrentHealth == 0)
+            {
+                return;
+            }
+
+            Console.WriteLine("{0}:{1}", mission.m_agent.Text(), mission.m_obj);
             switch (mission.m_obj)
             {
                 case Objective.goTo:
@@ -80,12 +86,14 @@ namespace Pizza
                 }
                 if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - 1), mission.m_attackAlongTheWay))
                 {
-                    Console.WriteLine("{0} picking up {1} at {2}", fish.Text(), amount, trash);
                     fish.pickUp(tile, amount);
 
                     fishPoint = path[path.Length - 2];
                     availableCapacity -= amount;
-                    Bb.Set(targetsInTrash, trash, false);
+                    if (tile.TrashAmount == 0)
+                    {
+                        Bb.Set(targetsInTrash, trash, false);
+                    }
                 }
                 else
                 {
@@ -116,7 +124,6 @@ namespace Pizza
             {
                 var dump = path[path.Length - 1];
                 var tile = ai.getTile(dump.X, dump.Y);
-                Console.WriteLine("{0} picking up {1} at {2}", fish.Text(), weight, dump);
                 fish.drop(tile, weight);
             }
         }
@@ -124,30 +131,23 @@ namespace Pizza
         public static void AttackTarget(AI ai, Mission mission)
         {
             Fish fish = mission.m_agent;
-            int attacks = fish.AttacksLeft;
-            if (attacks == 0)
+            if (fish.AttacksLeft == 0)
             {
                 return;
             }
 
-            Point fishPoint = fish.Point();
             int range = fish.Range;
 
             Bb.Update(ai);
 
-            while (attacks > 0)
-            {
-                BitArray passableOrTheirFish = Bb.GetPassable(fishPoint).Or(Bb.TheirFishMap);
-                BitArray targetsInTheirFish = new BitArray(mission.m_targets()).And(Bb.TheirFishMap);
+            Point fishPoint = fish.Point();
+            BitArray passableOrTheirFish = Bb.GetPassable(fishPoint).Or(Bb.TheirFishMap);
+            BitArray targetsInTheirFish = new BitArray(mission.m_targets()).And(Bb.TheirFishMap);
 
-                var path = Pather.aStar(fishPoint, targetsInTheirFish, passableOrTheirFish).ToArray();
-                if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - range), mission.m_attackAlongTheWay))
-                {
-                    var aim = path[path.Length - 1];
-                    var enemy = ai.getFish(aim.X, aim.Y);
-                    Console.WriteLine("{0} attack {1}", fish.Text(), enemy.Text());
-                    fish.attack(enemy);
-                }
+            var path = Pather.aStar(fishPoint, targetsInTheirFish, passableOrTheirFish).ToArray();
+            if (path.Length > 1)
+            {
+                 MoveAlong(fish, path.Range(0, path.Length - range), true);
             }
         }
 
@@ -164,12 +164,10 @@ namespace Pizza
             if (attackAlongTheWay)
             {
                 attacks = targetsEnRoute(fish, path);
-                Console.WriteLine("Attacks:{0}", attacks.Count);
                 if (attacks.ContainsKey(fish.Point()))
                 {
                     attacks[fish.Point()].ForEach(target =>
                     {
-                        Console.WriteLine("{0} attacked {1}", fish.Text(), target.Text());
                         fish.attack(target);
                     });
                 }
@@ -183,12 +181,10 @@ namespace Pizza
                 {
                     attacks[moveTo].ForEach(target =>
                     {
-                        Console.WriteLine("{0} attacked {1}", fish.Text(), target.Text());
                         fish.attack(target);
                     });
                 }
             }
-            Console.WriteLine("{0} moved to {1}", fish.Text(), fish.Point());
 
             var goal = fullPath.Last();
             return fish.X == goal.X && fish.Y == goal.Y;
@@ -207,7 +203,6 @@ namespace Pizza
 
             var distinct = new HashSet<Fish>();
             var distinctTargets = allTargets.Where(pt => distinct.Add(pt.t)).ToArray();
-            Console.WriteLine("Attacks:{0}, Range:{1}, AllPoints:{2}, AllTargets:{3}, DistinctTargets:{4}, DistinctTargets:{5}", attacks, range, allPoints.Count, allTargets.Count(), distinct.Count, distinctTargets.Count());
             
             var bests = new HashSet<Fish>();
             while (attacks > bests.Count && distinct.Any())
@@ -216,7 +211,6 @@ namespace Pizza
                 bests.Add(best);
                 distinct.Remove(best);
             }
-            Console.WriteLine("Bests:{0}", bests.Count);
 
             return distinctTargets.Where(pt => bests.Contains(pt.t))
                 .GroupBy(pt => pt.p, pt => pt.t)
