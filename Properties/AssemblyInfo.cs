@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Pizza")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("MST")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Pizza")]
-[assembly: AssemblyCopyright("Copyright © MST 2013")]
+[assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("5ff50e88-6bda-487e-84f9-b65943ff669b")]
+[assembly: Guid("d9512680-74f8-4cd0-841c-cd9548f4da4b")]
 
 // Version information for an assembly consists of the following four values:
 //
