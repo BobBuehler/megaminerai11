@@ -30,7 +30,7 @@ namespace Pizza
         public static bool GoTo(AI ai, Mission mission)
         {
             Fish fish = mission.m_agent;
-            Point fishPoint = new Point(fish.X, fish.Y);
+            Point fishPoint = fish.Point();
             BitArray targets = mission.m_targets();
             if (fish.MovementLeft == 0)
             {
@@ -58,7 +58,7 @@ namespace Pizza
                 return;
             }
 
-            Point fishPoint = new Point(fish.X, fish.Y);
+            Point fishPoint = fish.Point();
 
             Bb.Update(ai);
 
@@ -68,15 +68,22 @@ namespace Pizza
 
             while (availableCapacity > 0)
             {
+                Console.WriteLine("PassableOrTrash:");
+                Console.WriteLine(Bb.ToString(passableOrTrash, fishPoint));
+                Console.WriteLine("Targets:");
+                Console.WriteLine(Bb.ToString(targets));
                 var path = Pather.aStar(fishPoint, targets, passableOrTrash).ToArray();
+                Console.WriteLine("Goal:{0}", path[path.Length - 1]);
                 if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - 1)))
                 {
                     var trash = path[path.Length - 1];
                     var tile = ai.getTile(trash.X, trash.Y);
                     var amount = Math.Min(tile.TrashAmount, availableCapacity);
+                    if (amount == 0) Environment.Exit(1);
                     Console.WriteLine("{0} picking up {1} at {2}", fish.Text(), amount, trash);
                     fish.pickUp(tile, amount);
 
+                    fishPoint = path[path.Length - 2];
                     availableCapacity -= amount;
                     Bb.Set(targets, trash, false);
                 }
@@ -128,6 +135,11 @@ namespace Pizza
         public static String Text(this Fish fish)
         {
             return String.Format("{0}:{1}", (SpeciesIndex)fish.Species, fish.Id);
+        }
+
+        public static Point Point(this Fish fish)
+        {
+            return new Point(fish.X, fish.Y);
         }
     }
 }

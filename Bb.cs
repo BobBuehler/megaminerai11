@@ -87,6 +87,8 @@ namespace Pizza
         public static BitArray CoveMap;
         public static BitArray TheirCoveMap;
 
+        public static BitArray UnMappable;
+
         public static void init(AI ai)
         {
             MaxX = ai.mapWidth();
@@ -137,6 +139,8 @@ namespace Pizza
             TheirEelsMap = new BitArray(AI.tiles.Length);
             TheirJellyfishMap = new BitArray(AI.tiles.Length);
 
+            
+            
             //Fill Reef Maps
             foreach (var tile in BaseAI.tiles)
             {
@@ -153,9 +157,6 @@ namespace Pizza
                     NeutralReef[GetOffset(tile.X, tile.Y)] = true;
                 }
             }
-            Console.WriteLine(Bb.ToString(OurReef));
-            Console.WriteLine(Bb.ToString(NeutralReef));
-            Console.WriteLine(Bb.ToString(TheirReef));
 
             //BaseAI.fishes.ToList().ForEach(fish => FishMap.Set(GetOffset(fish.X, fish.Y), true));
 
@@ -496,8 +497,96 @@ namespace Pizza
                 }
             }
 
-            OurTrashMap = new BitArray(TrashMap).And(OurReef);  
+            OurTrashMap = new BitArray(TrashMap).And(OurReef);
             TheirTrashMap = new BitArray(TrashMap).And(TheirReef);
+        }
+
+
+        public static BitArray GetNAwayFromPoint(int n, Point point)
+        {
+            BitArray nAwayFromPoint = new BitArray(AI.tiles.Length);
+            int x = point.X;
+            int y = point.Y;
+
+
+            for (int i = 1; i <= n; i++)
+            {
+                if (y + i < MaxY)
+                {
+                    nAwayFromPoint[GetOffset(x, y + i)] = true;
+                }
+                if (y - i >= 0)
+                {
+                    nAwayFromPoint[GetOffset(x, y - i)] = true;
+                }
+                if (x + i < MaxX)
+                {
+                    nAwayFromPoint[GetOffset(x + i, y)] = true;
+                }
+                if (x - i >= 0)
+                {
+                    nAwayFromPoint[GetOffset(x - i, y)] = true;
+                }
+
+                for (int j = 1; j <= i - 1; j++)
+                {
+                    if (x + j < MaxX && y + i - j < MaxY && y + i - j >= 0)
+                    {
+                        nAwayFromPoint[GetOffset(x + j, y + i - j)] = true;
+                    }
+                    if (x - j >= 0 && y + i - j < MaxY && y + i - j >= 0)
+                    {
+                        nAwayFromPoint[GetOffset(x - j, y + i - j)] = true;
+                    }
+                    if (x + j < MaxX && y - i + j < MaxY && y - i + j >= 0)
+                    {
+                        nAwayFromPoint[GetOffset(x + j, y - i + j)] = true;
+                    }
+                    if (x - j >= 0 && y - i + j < MaxY && y - i + j >= 0)
+                    {
+                        nAwayFromPoint[GetOffset(x - j, y - i + j)] = true;
+                    }
+                }
+            }
+
+            return nAwayFromPoint;
+        }
+
+        public static BitArray GetNAwayFromPointMovable(int n, Point point)
+        {
+            BitArray nAwayFromPointMovable = new BitArray(AI.tiles.Length);
+
+            BitArray nAwayFromPoint = GetNAwayFromPoint(n, point);
+            BitArray passable = GetPassable();
+            HashSet<Point> visited = new HashSet<Point>();
+            Queue<Point> Q = new Queue<Point>();
+            Q.Enqueue(point);
+            visited.Add(point);
+
+            while (Q.Count > 0)
+            {
+                Point current = Q.Dequeue();
+
+                if (new BitArray(passable).And(nAwayFromPoint)[GetOffset(current.X, current.Y)])
+                {
+                    nAwayFromPointMovable[GetOffset(current.X, current.Y)] = true;
+                }
+                else
+                {
+                    continue;
+                }
+                foreach (Point p in BitArrayToList(GetNAwayFromPoint(1, current)))
+                {
+                    if (!visited.Contains(p))
+                    {
+                        visited.Add(p);
+                        Q.Enqueue(p);
+                    }
+                }
+            }
+
+            return nAwayFromPointMovable;
+
         }
 
         public static BitArray GetPassable()
@@ -524,7 +613,26 @@ namespace Pizza
 
         public static void Set(BitArray board, Point point, bool value)
         {
-            board.Set(GetOffset(point.X, point.X), value);
+            board.Set(GetOffset(point.X, point.Y), value);
+        }
+
+        public static List<Point> BitArrayToList(BitArray bB)
+        {
+            List<Point> trues = new List<Point>();
+
+            for (int i = 0; i < MaxX; i++)
+            {
+                for (int j = 0; i < MaxY; j++)
+                {
+                    if (Get(bB, i, j))
+                    {
+                        trues.Add(new Point(i, j));
+                    }
+                }
+            }
+
+            return trues;
+
         }
 
         public static string ToString(BitArray board)
