@@ -28,12 +28,14 @@ class AI : BaseAI
         JELLYFISH
     };
 
-    public static SpeciesIndex[] preferedSpeciesList = { SpeciesIndex.TOMCOD,
+    public static SpeciesIndex[] preferedSpeciesList = { SpeciesIndex.CUTTLEFISH,
+                                                           SpeciesIndex.CONESHELL_SNAIL,
+                                                           SpeciesIndex.TOMCOD,
                                                         SpeciesIndex.ANGELFISH,                                                        
-                                                        SpeciesIndex.CUTTLEFISH,
+                                                        
                                                         SpeciesIndex.JELLYFISH,
                                                         SpeciesIndex.REEF_SHARK,
-                                                        SpeciesIndex.CONESHELL_SNAIL,
+                                                        
                                                         SpeciesIndex.OCTOPUS,
                                                         SpeciesIndex.SEA_URCHIN,                                                        
                                                         SpeciesIndex.SPONGE,
@@ -299,7 +301,7 @@ class AI : BaseAI
         {
             return false;
         }
-        else if (s.SpeciesNum == (int)SpeciesIndex.CONESHELL_SNAIL && (Bb.OurSnailsSet.Count + 1 > Bb.OurSharksSet.Count && speciesList[(int)SpeciesIndex.REEF_SHARK].Season == currentSeason()))
+        else if (s.SpeciesNum == (int)SpeciesIndex.CONESHELL_SNAIL && (Bb.OurSnailsSet.Count + 3 > Bb.OurSharksSet.Count && speciesList[(int)SpeciesIndex.REEF_SHARK].Season == currentSeason()))
         {
             return false;
         }
@@ -408,45 +410,12 @@ class AI : BaseAI
         return 13;
     }
 
-    public void goNearAndDoSomething(Fish fish, BitArray want, Action<Tile> something)
-    {
-        Point fishPoint = new Point(fish.X, fish.Y);
-
-        BitArray passable = Bb.GetPassable().Or(want);
-        passable.Set(Bb.GetOffset(fishPoint.X, fishPoint.Y), true);
-
-        var path = Pather.aStar(fishPoint, want, passable).ToArray();
-        if (path.Length > 1)
-        {
-            var goal = path[path.Length - 1];
-            bool madeIt = true;
-            for (int i = 1; i < path.Length - 1; ++i)
-            {
-                if (fish.MovementLeft > 0)
-                {
-                    Console.WriteLine("({0},{1}) moving to {2}", fish.X, fish.Y, path[i]);
-                    fish.move(path[i].X, path[i].Y);
-                }
-                else
-                {
-                    madeIt = false;
-                    break;
-                }
-            }
-            if (madeIt)
-            {
-                Console.WriteLine("({0},{1}) did reach {2}", fish.X, fish.Y, goal);
-                something(getTile(goal.X, goal.Y));
-            }
-        }
-    }
-
     public void assignmissions()
     {
         assignJellyFishes();
         assignOctopi();
         assignCuttleFishes();
-        assignSharks();        
+        assignSharks();
         assignSnails();
         assignUrchins();
         assignTomcods();
