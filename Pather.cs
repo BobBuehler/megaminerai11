@@ -104,11 +104,11 @@ namespace Pizza
         private static IEnumerable<Point> buildPath(Dictionary<Point, Point> cameFrom, Point point)
         {
             yield return point;
-            do
+            while (cameFrom.ContainsKey(point))
             {
                 point = cameFrom[point];
                 yield return point;
-            } while (cameFrom.ContainsKey(point));
+            }
         }
 
         private static Point minCostPoint(HashSet<Point> openSet, Dictionary<Point, int> costs)
