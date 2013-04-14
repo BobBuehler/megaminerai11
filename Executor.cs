@@ -33,6 +33,9 @@ namespace Pizza
                 case Objective.dumpTrash:
                     DumpTrash(ai, mission);
                     break;
+                case Objective.coverWithTrash:
+                    CoverWithTrash(ai, mission);
+                    break;
                 case Objective.attackTarget:
                     AttackTarget(ai, mission);
                     break;
@@ -121,6 +124,32 @@ namespace Pizza
             Bb.Set(targetsInPassableOrTheirTrash, fishPoint, false);
 
             var path = Pather.aStar(fishPoint, targetsInPassableOrTheirTrash, passableOrTheirTrash).ToArray();
+            if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - 1), mission.m_attackAlongTheWay))
+            {
+                var dump = path[path.Length - 1];
+                var tile = ai.getTile(dump.X, dump.Y);
+                fish.drop(tile, weight);
+            }
+        }
+
+        public static void CoverWithTrash(AI ai, Mission mission)
+        {
+            Fish fish = mission.m_agent;
+            int weight = fish.CarryingWeight;
+            if (weight == 0)
+            {
+                return;
+            }
+
+            Point fishPoint = fish.Point();
+
+            Bb.Update(ai);
+
+            BitArray targetsNotCovered = new BitArray(Bb.TrashMap).Not().And(mission.m_targets());
+            Bb.Set(targetsNotCovered, fishPoint, false);
+            BitArray passableOrNotCovered = Bb.GetPassable(fishPoint).Or(targetsNotCovered);
+
+            var path = Pather.aStar(fishPoint, targetsNotCovered, passableOrNotCovered).ToArray();
             if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - 1), mission.m_attackAlongTheWay))
             {
                 var dump = path[path.Length - 1];
