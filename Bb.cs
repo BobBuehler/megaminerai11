@@ -141,8 +141,8 @@ namespace Pizza
                 }
             }
 
-            OurTrashMap = TrashMap.And(OurReef);
-            TheirTrashMap = TrashMap.And(TheirReef);
+            OurTrashMap = new BitArray(TrashMap).And(OurReef);
+            TheirTrashMap = new BitArray(TrashMap).And(TheirReef);
         }
 
         public static void Update(AI ai)
@@ -178,13 +178,46 @@ namespace Pizza
                 }
             }
 
-            OurTrashMap = TrashMap.And(OurReef);
-            TheirTrashMap = TrashMap.And(TheirReef);
+            OurTrashMap = new BitArray(TrashMap).And(OurReef);
+            TheirTrashMap = new BitArray(TrashMap).And(TheirReef);
         }
 
         public static int GetOffset(int x, int y)
         {
             return (y * MaxX + x);
+        }
+
+        public static bool Get(BitArray board, int x, int y)
+        {
+            return board[GetOffset(x, y)];
+        }
+
+        public static string ToString(BitArray board)
+        {
+            StringBuilder builder = new StringBuilder();
+            for (int y = 0; y < MaxY; ++y)
+            {
+                for (int x = 0; x < MaxX; ++x)
+                {
+                    builder.Append(Get(board, x, y) ? '#': '-');
+                }
+                builder.AppendLine();
+            }
+            return builder.ToString();
+        }
+
+        public static string ToString(BitArray board, Point mark)
+        {
+            StringBuilder builder = new StringBuilder();
+            for (int y = 0; y < MaxY; ++y)
+            {
+                for (int x = 0; x < MaxX; ++x)
+                {
+                    builder.Append((mark.X == x && mark.Y == y) ? 'X' : Get(board, x, y) ? '#' : ' ');
+                }
+                builder.AppendLine();
+            }
+            return builder.ToString();
         }
     }
 }

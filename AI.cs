@@ -70,115 +70,31 @@ class AI : BaseAI
 
         spawn();
 
+        Console.WriteLine("Trash:");
+        Console.WriteLine(Bb.ToString(Bb.TrashMap));
         // Iterate through all the fishes.
         foreach (Fish fish in fishes)
         {
             // Only attempt to move fish we own.
             if (fish.Owner == playerID())
             {
-                BitArray basePassable = Bb.WallMap.Or(Bb.CoveMap).Or(Bb.FishMap).Or(Bb.TrashMap).Not();
-                Point p = new Point(fish.X, fish.Y);
+                Console.WriteLine("Fish:" + fish.Id);
                 if (fish.CarryingWeight == 0)
                 {
-                    // seek trash
-                    var path = Pather.aStar(p, Bb.OurTrashMap, basePassable).ToArray();
-                    var goal = path[path.Length - 1];
-                    bool madeIt = true;
-                    for (int i = 1; i < path.Length - 1; ++i)
+                    goNearAndDoSomething(fish, Bb.TrashMap, g =>
                     {
-                        if (fish.MovementLeft > 0)
-                        {
-                            fish.move(path[i].X, path[i].Y);
-                        }
-                        else
-                        {
-                            madeIt = false;
-                            break;
-                        }
-                    }
-                    if (madeIt)
-                    {
-                        var goalTile = getTile(goal.X, goal.Y);
-                        fish.pickUp(goalTile, Math.Min(fish.CarryCap - fish.CarryingWeight, goalTile.TrashAmount));
-                    }
-                    Bb.Update(this);
-
+                        var tile = getTile(g.X, g.Y);
+                        fish.pickUp(tile, Math.Min(fish.CarryCap - fish.CarryingWeight, tile.TrashAmount));
+                    });
                 }
                 if (fish.CarryingWeight > 0 && fish.MovementLeft > 0)
                 {
-                    // seek enemy reef
-                    var path = Pather.aStar(p, Bb.TheirReef, basePassable).ToArray();
-                    var goal = path[path.Length - 1];
-                    bool madeIt = true;
-                    for (int i = 1; i < path.Length - 1; ++i)
+                    goNearAndDoSomething(fish, Bb.TrashMap, g =>
                     {
-                        if (fish.MovementLeft > 0)
-                        {
-                            fish.move(path[i].X, path[i].Y);
-                        }
-                        else
-                        {
-                            madeIt = false;
-                            break;
-                        }
-                    }
-                    if (madeIt)
-                    {
-                        var goalTile = getTile(goal.X, goal.Y);
-                        fish.drop(goalTile, fish.CarryingWeight);
-                    }
+                        var tile = getTile(g.X, g.Y);
+                        fish.drop(tile, fish.CarryingWeight);
+                    });
                 }
-                //// Try to move to the right.
-                //if (fish.X + 1 < mapWidth()                                 // We aren't moving off the map.
-                //    && fish.MovementLeft > 0                                // We have moves left.
-                //    && getFish(fish.X + 1, fish.Y) == null                  // We aren't moving onto another fish.
-                //    && getTile(fish.X + 1, fish.Y).Owner != 1 - playerID()  // We aren't moving onto an enemy cove.
-                //    && getTile(fish.X + 1, fish.Y).Owner != 3               // We aren't move onto a wall.
-                //    && getTile(fish.X + 1, fish.Y).HasEgg == 0              // We aren't moving onto an egg.
-                //    && getTile(fish.X + 1, fish.Y).TrashAmount == 0)        // We aren't moving onto trash.
-                //{
-                //    // Move one tile to the right.
-                //    fish.move(fish.X + 1, fish.Y);
-                //}
-
-                //// Try to pick up trash one tile below the fish.
-                //if (fish.Y + 1 < mapHeight()                            // Ensure we do not pick up off the map.
-                //    && getTile(fish.X, fish.Y + 1).TrashAmount > 0      // Ensure the tile has trash.
-                //    && fish.CarryCap - fish.CarryingWeight > 0          // Ensure we have the necessary capacity.
-                //    && fish.CurrentHealth >= 1)                         // Ensure we have enough health.
-                //{
-                //    // Pick up trash one tile below the fish.
-                //    fish.pickUp(getTile(fish.X, fish.Y + 1), 1);
-                //}
-
-                //// Try to drop trash one tile above the fish.
-                //if (fish.Y - 1 >= 0                             // Ensure we do not drop off the map.
-                //    && fish.CarryingWeight > 0                  // Ensure we have something to drop.
-                //    && getFish(fish.X, fish.Y - 1) == null)     // Ensure we don't drop on a fish.
-                //{
-                //    // Drop trash one tile above the fish.
-                //    fish.drop(getTile(fish.X, fish.Y - 1), 1);
-                //}
-
-                //// Try to do an action to the left based on species.
-                //if (fish.X - 1 > 0                                      // We are not attacking off the map.
-                //    && fish.AttacksLeft > 0                             // We have attacks left.
-                //    && getFish(fish.X - 1, fish.Y) != null)             // There is a fish at that spot.
-                //{
-                //    // If we're not a cleaner shrimp...
-                //    if ((SpeciesIndex)fish.Species != SpeciesIndex.CLEANER_SHRIMP)
-                //    {
-                //        // Try to attack fish to the left.
-                //        if (getFish(fish.X - 1, fish.Y).Owner != playerID()) // The fish belongs to the opponent.
-                //            fish.attack(getFish(fish.X - 1, fish.Y));
-                //    }
-                //    else
-                //    {
-                //        // Try to heal allied fish to the left.
-                //        if (getFish(fish.X - 1, fish.Y).Owner == playerID()) // The fish belongs to me.
-                //            fish.attack(getFish(fish.X - 1, fish.Y));
-                //    }
-                //}
             }
         }
 
@@ -260,6 +176,41 @@ class AI : BaseAI
                         break;
                     }
                 }
+            }
+        }
+    }
+
+    public void goNearAndDoSomething(Fish fish, BitArray want, Action<Point> something)
+    {
+        Point p = new Point(fish.X, fish.Y);
+
+        Bb.Update(this);
+        BitArray passable = new BitArray(Bb.WallMap).Or(Bb.CoveMap).Or(Bb.FishMap).Not().Or(want);
+        passable.Set(Bb.GetOffset(p.X, p.Y), true);
+
+        var path = Pather.aStar(p, Bb.OurTrashMap, passable).ToArray();
+        if (path.Length > 1)
+        {
+            var goal = path[path.Length - 1];
+            bool madeIt = true;
+            for (int i = 1; i < path.Length - 1; ++i)
+            {
+                if (fish.MovementLeft > 0)
+                {
+                    Console.WriteLine("({0},{1}) moving to {2}", fish.X, fish.Y, path[i]);
+                    fish.move(path[i].X, path[i].Y);
+                }
+                else
+                {
+                    madeIt = false;
+                    break;
+                }
+            }
+            if (madeIt)
+            {
+                Console.WriteLine("({0},{1}) did reach {2}", fish.X, fish.Y, goal);
+                var goalTile = getTile(goal.X, goal.Y);
+                something(goal);
             }
         }
     }

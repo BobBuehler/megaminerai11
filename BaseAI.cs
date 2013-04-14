@@ -19,7 +19,6 @@ public abstract class BaseAI
 
     public BaseAI(IntPtr c)
     {
-        Console.WriteLine("BaseAI: Hi");
         connection = c;
     }
 

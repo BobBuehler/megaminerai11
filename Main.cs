@@ -1,5 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
+using Pizza;
+using System.Collections;
 
 
 public class main
@@ -8,14 +10,37 @@ public class main
     {
         if (args.Length < 1)
         {
-            System.Console.WriteLine("Please enter a hostname");
-            return;
+            string defaultHost = "r99acm.device.mst.edu";
+            System.Console.Write("Game Id: ");
+            string gameId = System.Console.ReadLine();
+            args = new string[] { defaultHost, gameId };
+            if (args[1] == "")
+            {
+                Bb.MaxX = 5;
+                Bb.MaxY = 5;
+                BitArray passable = new BitArray(new bool[] {
+                true, true, true, false, true,
+                true, false, false, true, true,
+                true, true, true, true, true,
+                false, false, false, true, true,
+                true, true, true, true, false });
+                foreach (Point p in Pather.aStar(new Point(3, 3), new Point(0, 0), passable))
+                {
+                    Console.WriteLine(p);
+                }
+                BitArray want = new BitArray(new bool[] {
+                false, false, false, false, false,
+                false, false, false, false, false,
+                false, false, false, false, false,
+                false, false, false, false, false,
+                false, false, false, false, false });
+                Console.WriteLine(Pather.aStar(new Point(3, 3), want, passable));
+                return;
+            }
         }
 
-        Console.WriteLine("Hi");
-        IntPtr connection = Client.createConnection();
 
-        Console.WriteLine("Hi");
+        IntPtr connection = Client.createConnection();
 
         AI ai = new AI(connection);
         if ((Client.serverConnect(connection, args[0], "19000")) == 0)
