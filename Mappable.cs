@@ -74,5 +74,14 @@ public class Mappable
     }
   }
 
+  public override bool Equals(object obj)
+  {
+      return obj is Mappable && ((Mappable) obj).Id == this.Id;
+  }
+
+  public override int GetHashCode()
+  {
+      return this.Id;
+  }
 }
 

@@ -49,7 +49,7 @@ namespace Pizza
             BitArray targetsInPassable = new BitArray(mission.m_targets()).And(passable);
 
             var path = Pather.aStar(fishPoint, targetsInPassable, passable);
-            MoveAlong(fish, path);
+            MoveAlong(fish, path, mission.m_attackAlongTheWay);
         }
 
         public static void GetTrash(AI ai, Mission mission)
@@ -78,7 +78,7 @@ namespace Pizza
                 {
                     return; // Can't pick it up
                 }
-                if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - 1)))
+                if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - 1), mission.m_attackAlongTheWay))
                 {
                     Console.WriteLine("{0} picking up {1} at {2}", fish.Text(), amount, trash);
                     fish.pickUp(tile, amount);
@@ -112,7 +112,7 @@ namespace Pizza
             Bb.Set(targetsInPassableOrTheirTrash, fishPoint, false);
 
             var path = Pather.aStar(fishPoint, targetsInPassableOrTheirTrash, passableOrTheirTrash).ToArray();
-            if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - 1)))
+            if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - 1), mission.m_attackAlongTheWay))
             {
                 var dump = path[path.Length - 1];
                 var tile = ai.getTile(dump.X, dump.Y);
@@ -141,7 +141,7 @@ namespace Pizza
                 BitArray targetsInTheirFish = new BitArray(mission.m_targets()).And(Bb.TheirFishMap);
 
                 var path = Pather.aStar(fishPoint, targetsInTheirFish, passableOrTheirFish).ToArray();
-                if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - range)))
+                if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - range), mission.m_attackAlongTheWay))
                 {
                     var aim = path[path.Length - 1];
                     var enemy = ai.getFish(aim.X, aim.Y);
@@ -152,17 +152,33 @@ namespace Pizza
         }
 
 
-        private static bool MoveAlong(Fish fish, IEnumerable<Point> path)
+        private static bool MoveAlong(Fish fish, IEnumerable<Point> path, bool attackAlongTheWay)
         {
             Point[] fullPath = path.ToArray();
             if (fullPath.Length == 0)
             {
                 return true;
             }
+
+            Dictionary<Point, IEnumerable<Fish>> attacks = null;
+            if (attackAlongTheWay)
+            {
+                attacks = targetsEnRoute(fish, path);
+                attacks[fish.Point()].ForEach(target => fish.attack(target));
+            }
+
             for (int i = 1; i < fullPath.Length && fish.MovementLeft > 0; ++i)
             {
                 Point moveTo = fullPath[i];
                 fish.move(moveTo.X, moveTo.Y);
+                if (attacks != null)
+                {
+                    attacks[moveTo].ForEach(target =>
+                    {
+                        Console.WriteLine("{0} attacked {1}", fish.Text(), target.Text());
+                        fish.attack(target);
+                    });
+                }
             }
             Console.WriteLine("{0} moved to {1}", fish.Text(), fish.Point());
 
@@ -170,9 +186,37 @@ namespace Pizza
             return fish.X == goal.X && fish.Y == goal.Y;
         }
 
+        private static Dictionary<Point, IEnumerable<Fish>> targetsEnRoute(Fish fish, IEnumerable<Point> path)
+        {
+            int attacks = fish.AttacksLeft;
+            int range = fish.Range;
+            int enemy = 1 - fish.Owner;
+            var targets = new Dictionary<Point,IEnumerable<Fish>>();
+            targets[fish.Point()] = Picker.GetTargets(range, fish.Point(), enemy);
+            var distinct = new HashSet<Fish>();
+            path.ForEach(p => targets[p] = Picker.GetTargets(range, p, enemy).Where(f => distinct.Add(f)));
+            Console.WriteLine("{0} targets", distinct.Count);
+            var aim = new HashSet<Fish>();
+            while (attacks < aim.Count && distinct.Any())
+            {
+                var next = Picker.GetBestTarget(distinct);
+                aim.Add(next);
+                distinct.Remove(next);
+            }
+            return targets.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Where(f => aim.Contains(f)));
+        }
+
         private static IEnumerable<T> Range<T>(this IEnumerable<T> source, int start, int end)
         {
             return source.Where((s, i) => i >= start && i < end);
+        }
+
+        private static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
+        {
+            foreach (var s in source)
+            {
+                action(s);
+            }
         }
 
         /// <summary>
