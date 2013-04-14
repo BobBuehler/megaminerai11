@@ -9,7 +9,7 @@ namespace Pizza
     enum Objective
     {
         goTo,
-        getTrash,
+        getNearestTrash,
         dumpTrashClose,
         dumpTrashFar,
         dodgeInReef,

@@ -235,14 +235,150 @@ class AI : BaseAI
         assignStarfish();
     }
 
+    //public void assignStarfish()
+    //{
+    //    foreach (Fish f in Bb.OurStarfishSet)
+    //    {
+    //        missions.Add(new Mission(f, Objective.goTo, Bb.TheirReef));
+    //        if (f.MovementLeft > 0)
+    //        {
+    //            missions.Add(new Mission(f, Objective.dodgeInReef, Bb.TheirReef,false));
+    //        }
+    //    }
+    //}
+
     public void assignStarfish()
     {
         foreach (Fish f in Bb.OurStarfishSet)
         {
-            missions.Add(new Mission(f, Objective.goTo, Bb.TheirReef));
+            missions.Add(new Mission(f, Objective.getNearestTrash, Bb.OurTrashMap));
             if (f.MovementLeft > 0)
             {
-                missions.Add(new Mission(f, Objective.dodgeInReef, Bb.TheirReef,false));
+                missions.Add(new Mission(f, Objective.dumpTrashClose, Bb.TheirReef));
+            }
+        }
+    }
+
+    public void assignSponges()
+    {
+        foreach (Fish f in Bb.OurSpongesMap)
+        {
+            missions.Add(new Mission(f, Objective.getNearestTrash, Bb.OurTrashMap));
+            if (f.MovementLeft > 0)
+            {
+                missions.Add(new Mission(f, Objective.dumpTrashClose, Bb.TheirReef));
+            }
+        }
+    }
+
+    public void assignAngelfishes()
+    {
+        foreach (Fish f in Bb.OurAngelfishesMap)
+        {
+            missions.Add(new Mission(f, Objective.getNearestTrash, Bb.OurTrashMap));
+            if (f.MovementLeft > 0)
+            {
+                missions.Add(new Mission(f, Objective.dumpTrashClose, Bb.TheirReef));
+            }
+        }
+    }
+
+    public void assignSnails()
+    {
+        foreach (Fish f in Bb.OurSnailsMap)
+        {
+            missions.Add(new Mission(f, Objective.getNearestTrash, Bb.OurTrashMap));
+            if (f.MovementLeft > 0)
+            {
+                missions.Add(new Mission(f, Objective.dumpTrashClose, Bb.TheirReef));
+            }
+        }
+    }
+    public void assignUrchins()
+    {
+        foreach (Fish f in Bb.OurUrchinsMap)
+        {
+            missions.Add(new Mission(f, Objective.getNearestTrash, Bb.OurTrashMap));
+            if (f.MovementLeft > 0)
+            {
+                missions.Add(new Mission(f, Objective.dumpTrashClose, Bb.TheirReef));
+            }
+        }
+    }
+    public void assignOctopi()
+    {
+        foreach (Fish f in Bb.OurOctopiMap)
+        {
+            missions.Add(new Mission(f, Objective.getNearestTrash, Bb.OurTrashMap));
+            if (f.MovementLeft > 0)
+            {
+                missions.Add(new Mission(f, Objective.dumpTrashClose, Bb.TheirReef));
+            }
+        }
+    }
+    public void assignTomcods()
+    {
+        foreach (Fish f in Bb.OurTomcodsMap)
+        {
+            missions.Add(new Mission(f, Objective.getNearestTrash, Bb.OurTrashMap));
+            if (f.MovementLeft > 0)
+            {
+                missions.Add(new Mission(f, Objective.dumpTrashClose, Bb.TheirReef));
+            }
+        }
+    }
+    public void assignSharks()
+    {
+        foreach (Fish f in Bb.OurSharksMap)
+        {
+            missions.Add(new Mission(f, Objective.getNearestTrash, Bb.OurTrashMap));
+            if (f.MovementLeft > 0)
+            {
+                missions.Add(new Mission(f, Objective.dumpTrashClose, Bb.TheirReef));
+            }
+        }
+    }
+    public void assignCuttleFishes()
+    {
+        foreach (Fish f in Bb.OurFishMap)
+        {
+            missions.Add(new Mission(f, Objective.getNearestTrash, Bb.OurTrashMap));
+            if (f.MovementLeft > 0)
+            {
+                missions.Add(new Mission(f, Objective.dumpTrashClose, Bb.TheirReef));
+            }
+        }
+    }
+    public void assignShrimp()
+    {
+        foreach (Fish f in Bb.OurShrimpsMap)
+        {
+            missions.Add(new Mission(f, Objective.getNearestTrash, Bb.OurTrashMap));
+            if (f.MovementLeft > 0)
+            {
+                missions.Add(new Mission(f, Objective.dumpTrashClose, Bb.TheirReef));
+            }
+        }
+    }
+    public void assignEels()
+    {
+        foreach (Fish f in Bb.OurEelsMap)
+        {
+            missions.Add(new Mission(f, Objective.getNearestTrash, Bb.OurTrashMap));
+            if (f.MovementLeft > 0)
+            {
+                missions.Add(new Mission(f, Objective.dumpTrashClose, Bb.TheirReef));
+            }
+        }
+    }
+    public void assignJellyFishes()
+    {
+        foreach (Fish f in Bb.OurJellyfishMap)
+        {
+            missions.Add(new Mission(f, Objective.getNearestTrash, Bb.OurTrashMap));
+            if (f.MovementLeft > 0)
+            {
+                missions.Add(new Mission(f, Objective.dumpTrashClose, Bb.TheirReef));
             }
         }
     }
