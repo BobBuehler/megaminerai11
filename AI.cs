@@ -29,15 +29,15 @@ class AI : BaseAI
     };
 
     public static SpeciesIndex[] preferedSpeciesList = { SpeciesIndex.TOMCOD,
-                                                        SpeciesIndex.SEA_STAR,
                                                         SpeciesIndex.ANGELFISH,
+                                                        SpeciesIndex.SEA_STAR,
                                                         SpeciesIndex.CUTTLEFISH,
                                                         SpeciesIndex.JELLYFISH,
-                                                        SpeciesIndex.SPONGE,
                                                         SpeciesIndex.REEF_SHARK,
                                                         SpeciesIndex.CONESHELL_SNAIL,
                                                         SpeciesIndex.SEA_URCHIN,
-                                                        SpeciesIndex.OCTOPUS };
+                                                        SpeciesIndex.OCTOPUS,
+                                                        SpeciesIndex.SPONGE };
 
     List<List<Mission>> missions = new List<List<Mission>>();
     Func<BitArray> ourTrash = () => Bb.OurReef;
