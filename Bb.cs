@@ -505,6 +505,13 @@ namespace Pizza
             return new BitArray(Bb.WallMap).Or(Bb.CoveMap).Or(Bb.FishMap).Or(Bb.TrashMap).Not();
         }
 
+        public static BitArray GetPassable(Point forcePassable)
+        {
+            BitArray passable = GetPassable();
+            passable.Set(GetOffset(forcePassable.X, forcePassable.Y), true);
+            return passable;
+        }
+
         public static int GetOffset(int x, int y)
         {
             return (y * MaxX + x);
@@ -513,6 +520,11 @@ namespace Pizza
         public static bool Get(BitArray board, int x, int y)
         {
             return board[GetOffset(x, y)];
+        }
+
+        public static void Set(BitArray board, Point point, bool value)
+        {
+            board.Set(GetOffset(point.X, point.X), value);
         }
 
         public static string ToString(BitArray board)

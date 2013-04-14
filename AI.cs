@@ -117,7 +117,7 @@ class AI : BaseAI
     /// <param name="y">The y coordinate.</param>
     /// <returns>The Tile with the specififed coordinates.</returns>
     /// <exception cref="System.ArgumentException">The specified x and y coordinates must be on the map.</exception>
-    Tile getTile(int x, int y)
+    public Tile getTile(int x, int y)
     {
         if (x < 0 || y < 0 || x > mapWidth() || y > mapHeight())
             throw new ArgumentException(String.Format("The specified x and y coordinates ({0}, {1}) must be on the map.", x, y));
