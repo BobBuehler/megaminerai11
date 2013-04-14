@@ -42,8 +42,8 @@ namespace Pizza
             {
                 attacker = a_attacker;
             }
-            
-            int IComparer.Compare(Fish a, Fish b)
+
+            int IComparer<Fish>.Compare(Fish a, Fish b)
             {
                 if (a.CurrentHealth <= attacker.AttackPower && b.CurrentHealth > attacker.AttackPower)
                 {

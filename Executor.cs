@@ -15,7 +15,7 @@ namespace Pizza
 
         public static void Execute(AI ai, Mission mission)
         {
-            switch(mission.m_obj)
+            switch (mission.m_obj)
             {
                 case Objective.goTo:
                     GoTo(ai, mission);
@@ -42,7 +42,7 @@ namespace Pizza
             }
 
             Point fishPoint = fish.Point();
-            
+
             Bb.Update(ai);
 
             BitArray passable = Bb.GetPassable(fishPoint);
@@ -160,18 +160,26 @@ namespace Pizza
                 return true;
             }
 
-            Dictionary<Point, IEnumerable<Fish>> attacks = null;
+            var attacks = new Dictionary<Point,IEnumerable<Fish>>();
             if (attackAlongTheWay)
             {
                 attacks = targetsEnRoute(fish, path);
-                attacks[fish.Point()].ForEach(target => fish.attack(target));
+                Console.WriteLine("Attacks:{0}", attacks.Count);
+                if (attacks.ContainsKey(fish.Point()))
+                {
+                    attacks[fish.Point()].ForEach(target =>
+                    {
+                        Console.WriteLine("{0} attacked {1}", fish.Text(), target.Text());
+                        fish.attack(target);
+                    });
+                }
             }
 
             for (int i = 1; i < fullPath.Length && fish.MovementLeft > 0; ++i)
             {
                 Point moveTo = fullPath[i];
                 fish.move(moveTo.X, moveTo.Y);
-                if (attacks != null)
+                if (attacks.ContainsKey(moveTo))
                 {
                     attacks[moveTo].ForEach(target =>
                     {
@@ -191,19 +199,28 @@ namespace Pizza
             int attacks = fish.AttacksLeft;
             int range = fish.Range;
             int enemy = 1 - fish.Owner;
-            var targets = new Dictionary<Point,IEnumerable<Fish>>();
-            targets[fish.Point()] = Picker.GetTargets(range, fish.Point(), enemy);
+
+            var allPoints = new List<Point>(path);
+            allPoints.Add(fish.Point());
+
+            var allTargets = allPoints.SelectMany(p => Picker.GetTargets(range, p, enemy).Select(t => new { p = p, t = t }));
+
             var distinct = new HashSet<Fish>();
-            path.ForEach(p => targets[p] = Picker.GetTargets(range, p, enemy).Where(f => distinct.Add(f)));
-            Console.WriteLine("{0} targets", distinct.Count);
-            var aim = new HashSet<Fish>();
-            while (attacks < aim.Count && distinct.Any())
+            var distinctTargets = allTargets.Where(pt => distinct.Add(pt.t)).ToArray();
+            Console.WriteLine("Attacks:{0}, Range:{1}, AllPoints:{2}, AllTargets:{3}, DistinctTargets:{4}, DistinctTargets:{5}", attacks, range, allPoints.Count, allTargets.Count(), distinct.Count, distinctTargets.Count());
+            
+            var bests = new HashSet<Fish>();
+            while (attacks > bests.Count && distinct.Any())
             {
-                var next = Picker.GetBestTarget(distinct);
-                aim.Add(next);
-                distinct.Remove(next);
+                var best = Picker.GetBestTarget(distinct, fish);
+                bests.Add(best);
+                distinct.Remove(best);
             }
-            return targets.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Where(f => aim.Contains(f)));
+            Console.WriteLine("Bests:{0}", bests.Count);
+
+            return distinctTargets.Where(pt => bests.Contains(pt.t))
+                .GroupBy(pt => pt.p, pt => pt.t)
+                .ToDictionary(g => g.Key, g => (IEnumerable<Fish>)g);
         }
 
         private static IEnumerable<T> Range<T>(this IEnumerable<T> source, int start, int end)
