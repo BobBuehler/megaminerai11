@@ -8,11 +8,11 @@ namespace Pizza
 {
     enum Objective
     {
-        goTo,//ie: Bb.OurReef
-        getTrash,//ie: Bb.OurTrashMap
-        dumpTrash,//ie: Bb.TheirReef, 
-        surviveWithInTarget,// implement last. bounds i want the fish to dodge in  ie:Bb.TheirReef 
-        attackTarget// move to nearest target in input and attack ie: Bb.TheirFishMap
+        goTo,
+        getTrash,
+        dumpTrash,
+        surviveWithInTarget,
+        attackTarget
     };
 
     class Mission

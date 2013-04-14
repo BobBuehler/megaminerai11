@@ -135,7 +135,7 @@ class AI : BaseAI
     /// <param name="x">The x coordinate.</param>
     /// <param name="y">The y coordinate.</param>
     /// <returns>The Fish at the specified coordinates if there is one; otherwise, null.</returns>
-    Fish getFish(int x, int y)
+    public Fish getFish(int x, int y)
     {
         if (fishes.Count(f => f.X == x && f.Y == y) != 0)
             return fishes.First(f => f.X == x && f.Y == y);

@@ -21,38 +21,38 @@ namespace Pizza
                     GoTo(ai, mission);
                     break;
                 case Objective.getTrash:
-                    GetNearestTrash(ai, mission);
+                    GetTrash(ai, mission);
                     break;
                 case Objective.dumpTrash:
                     DumpTrash(ai, mission);
+                    break;
+                case Objective.attackTarget:
+                    AttackTarget(ai, mission);
                     break;
             }
             return;
         }
 
-        public static bool GoTo(AI ai, Mission mission)
+        public static void GoTo(AI ai, Mission mission)
         {
             Fish fish = mission.m_agent;
-            Point fishPoint = fish.Point();
-            BitArray targets = mission.m_targets();
             if (fish.MovementLeft == 0)
             {
-                return Bb.Get(targets, fishPoint.X, fishPoint.Y);
+                return;
             }
 
-
+            Point fishPoint = fish.Point();
+            
             Bb.Update(ai);
 
             BitArray passable = Bb.GetPassable(fishPoint);
+            BitArray targetsInPassable = new BitArray(mission.m_targets()).And(passable);
 
-            // Only the targets that can be achieved
-            targets = new BitArray(targets).And(passable);
-
-            var path = Pather.aStar(fishPoint, targets, passable);
-            return MoveAlong(fish, path);
+            var path = Pather.aStar(fishPoint, targetsInPassable, passable);
+            MoveAlong(fish, path);
         }
 
-        public static void GetNearestTrash(AI ai, Mission mission)
+        public static void GetTrash(AI ai, Mission mission)
         {
             Fish fish = mission.m_agent;
             int availableCapacity = fish.CarryCap - fish.CarryingWeight;
@@ -65,12 +65,12 @@ namespace Pizza
 
             Bb.Update(ai);
 
-            BitArray targets = new BitArray(mission.m_targets()).And(Bb.TrashMap);
-            BitArray passableOrTrash = Bb.GetPassable(fishPoint).Or(targets);
+            BitArray targetsInTrash = new BitArray(mission.m_targets()).And(Bb.TrashMap);
+            BitArray passableOrTargetsInTrash = Bb.GetPassable(fishPoint).Or(targetsInTrash);
 
             while (availableCapacity > 0)
             {
-                var path = Pather.aStar(fishPoint, targets, passableOrTrash).ToArray();
+                var path = Pather.aStar(fishPoint, targetsInTrash, passableOrTargetsInTrash).ToArray();
                 var trash = path[path.Length - 1];
                 var tile = ai.getTile(trash.X, trash.Y);
                 var amount = Math.Min(Math.Min(tile.TrashAmount, availableCapacity), fish.CurrentHealth - 1);
@@ -85,7 +85,7 @@ namespace Pizza
 
                     fishPoint = path[path.Length - 2];
                     availableCapacity -= amount;
-                    Bb.Set(targets, trash, false);
+                    Bb.Set(targetsInTrash, trash, false);
                 }
                 else
                 {
@@ -107,11 +107,11 @@ namespace Pizza
 
             Bb.Update(ai);
 
-            BitArray passable = Bb.GetPassable(fishPoint).Or(Bb.TheirTrashMap);
-            BitArray targets = new BitArray(mission.m_targets()).And(passable);
-            Bb.Set(targets, fishPoint, false);
+            BitArray passableOrTheirTrash = Bb.GetPassable(fishPoint).Or(Bb.TheirTrashMap);
+            BitArray targetsInPassableOrTheirTrash = new BitArray(mission.m_targets()).And(passableOrTheirTrash);
+            Bb.Set(targetsInPassableOrTheirTrash, fishPoint, false);
 
-            var path = Pather.aStar(fishPoint, targets, passable).ToArray();
+            var path = Pather.aStar(fishPoint, targetsInPassableOrTheirTrash, passableOrTheirTrash).ToArray();
             if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - 1)))
             {
                 var dump = path[path.Length - 1];
@@ -121,10 +121,44 @@ namespace Pizza
             }
         }
 
+        public static void AttackTarget(AI ai, Mission mission)
+        {
+            Fish fish = mission.m_agent;
+            int attacks = fish.AttacksLeft;
+            if (attacks == 0)
+            {
+                return;
+            }
+
+            Point fishPoint = fish.Point();
+            int range = fish.Range;
+
+            Bb.Update(ai);
+
+            while (attacks > 0)
+            {
+                BitArray passableOrTheirFish = Bb.GetPassable(fishPoint).Or(Bb.TheirFishMap);
+                BitArray targetsInTheirFish = new BitArray(mission.m_targets()).And(Bb.TheirFishMap);
+
+                var path = Pather.aStar(fishPoint, targetsInTheirFish, passableOrTheirFish).ToArray();
+                if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - range)))
+                {
+                    var aim = path[path.Length - 1];
+                    var enemy = ai.getFish(aim.X, aim.Y);
+                    Console.WriteLine("{0} attack {1}", fish.Text(), enemy.Text());
+                    fish.attack(enemy);
+                }
+            }
+        }
+
 
         private static bool MoveAlong(Fish fish, IEnumerable<Point> path)
         {
             Point[] fullPath = path.ToArray();
+            if (fullPath.Length == 0)
+            {
+                return true;
+            }
             for (int i = 1; i < fullPath.Length && fish.MovementLeft > 0; ++i)
             {
                 Point moveTo = fullPath[i];
