@@ -30,7 +30,7 @@ namespace Pizza
 
         public static IEnumerable<Point> aStar(Point start, Point goal, BitArray passable)
         {
-            return aStar(start, p => p.Equals(goal), p => manhattanDistance(p, goal), passable);
+            return aStar(start, p => p.Equals(goal), p => ManhattanDistance(p, goal), passable);
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace Pizza
                 bb[point.Y * Bb.MaxX + point.X];
         }
 
-        private static int manhattanDistance(Point point1, Point point2)
+        public static int ManhattanDistance(Point point1, Point point2)
         {
             return Math.Abs(point2.X - point1.X) + Math.Abs(point2.Y - point1.Y);
         }

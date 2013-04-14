@@ -346,9 +346,9 @@ namespace Pizza
             return String.Format("{0}:{1}", (SpeciesIndex)fish.Species, fish.Id);
         }
 
-        public static Point Point(this Fish fish)
+        public static Point Point(this Mappable m)
         {
-            return new Point(fish.X, fish.Y);
+            return new Point(m.X, m.Y);
         }
     }
 }
