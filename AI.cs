@@ -29,20 +29,21 @@ class AI : BaseAI
     };
 
     public static SpeciesIndex[] preferedSpeciesList = { SpeciesIndex.TOMCOD,
-                                                        SpeciesIndex.ANGELFISH,
-                                                        SpeciesIndex.SEA_STAR,
+                                                        SpeciesIndex.ANGELFISH,                                                        
                                                         SpeciesIndex.CUTTLEFISH,
                                                         SpeciesIndex.JELLYFISH,
                                                         SpeciesIndex.REEF_SHARK,
                                                         SpeciesIndex.CONESHELL_SNAIL,
-                                                        SpeciesIndex.SEA_URCHIN,
                                                         SpeciesIndex.OCTOPUS,
-                                                        SpeciesIndex.SPONGE };
+                                                        SpeciesIndex.SEA_URCHIN,                                                        
+                                                        SpeciesIndex.SPONGE,
+                                                        SpeciesIndex.SEA_STAR};
 
     List<List<Mission>> missions = new List<List<Mission>>();
     Func<BitArray> ourTrash = () => Bb.OurReef;
     Func<BitArray> notUrchin = () => new BitArray(Bb.TheirUrchinsMap).Not();
-    //Func<BitArray> ourTrash = () => (Bb.OurReef.Or(Bb.NeutralReef));
+    List<int> emergencyCarriers = new List<int>();
+    int maxExtraNonCarries = 3;
 
     /// <summary>
     /// Returns your username.
@@ -70,11 +71,16 @@ class AI : BaseAI
     public override bool run()
     {
         Console.WriteLine("Turn:{0}", iteration);
-
+        if (turnNumber() >= 30)
+        {
+            ourTrash = () => new BitArray(Bb.OurReef).Or(Bb.NeutralReef);
+        }
+        missions.Clear();
         Bb.Update(this);
+        manageSpecials();
         spawn();
         assignmissions();
-        Executor.Execute(this,missions);
+        Executor.Execute(this, missions);
         /*
         Executor.Execute(this, fishes.Where(f => f.Owner == playerID()).Select(f => new Mission[]
             {
@@ -140,8 +146,87 @@ class AI : BaseAI
     #endregion
 
     //############################ our code ######################################
+    public void manageSpecials()
+    {
+        try
+        {
+            removeDeadFish();
+            if (specialsRequired())
+            {
+                maxExtraNonCarries = 7;
+                foreach (Tile tile in Bb.OurCoveSet)
+                {
+                    if (emergencyCarriers.Count < 2 && getFish(tile.X, tile.Y) != null)
+                    {
+                        emergencyCarriers.Add(getFish(tile.X, tile.Y).Id);
+                    }
+                }
+                if (emergencyCarriers.Count < 2)
+                {
+                    foreach (Fish f in fishes)
+                    {
+                        if (f.Owner == playerID())
+                        {
+                            emergencyCarriers.Add(f.Id);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                maxExtraNonCarries = 3;
+            }
+            foreach (Fish f in fishes)
+            {
+                if (emergencyCarriers.Contains(f.Id))
+                {
+                    List<Mission> mission = new List<Mission>();
+                    mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
+                    mission.Add(new Mission(f, Objective.getTrash, ourTrash));
+                    mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
+                    mission.Add(new Mission(f, Objective.getTrash, ourTrash));
+                    missions.Add(mission);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+    public void removeDeadFish()//todo: make this efficient
+    {
+        try
+        {
+            List<int> newList = new List<int>();
+            foreach (Fish f in fishes)
+            {
+                if (emergencyCarriers.Contains(f.Id))
+                {
+                    newList.Add(f.Id);
+                }
+            }
+            emergencyCarriers.Clear();
+            emergencyCarriers = newList;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    public bool specialsRequired()
+    {
+        if (carryCount() == 0 && turnNumber() % seasonLength() < 43)
+        {
+            return true;
+        }
+        return false;
+    }
+
     public void spawn()
     {
+        int spawnCount = 0;
         if (!saveMoney())
         {
             // Iterate across all tiles.
@@ -151,17 +236,103 @@ class AI : BaseAI
                 if (tile.HasEgg == 0 && getFish(tile.X, tile.Y) == null)
                 {
                     List<Species> ps = calcPreferedSpecies();
-                    foreach(Species s in ps){
-                        if (s.Season == currentSeason() && players[playerID()].SpawnFood >= s.Cost)
+                    foreach (Species s in ps)
+                    {
+                        if (s.Season == currentSeason())
                         {
-                            // ...spawn it and break (can't spawn multiple fish on the same cove).
-                            s.spawn(tile);
-                            break;
+                            if (players[playerID()].SpawnFood >= s.Cost)
+                            {
+                                // ...spawn it and break (can't spawn multiple fish on the same cove).
+                                if (shouldSpawn(s, spawnCount))
+                                {
+                                    s.spawn(tile);
+                                    spawnCount++;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                // if tomcod or angelfish are in season and we have less than 4 tomcod or angelfish save the money!
+                                if (s.SpeciesNum == (int)SpeciesIndex.TOMCOD || s.SpeciesNum == (int)SpeciesIndex.ANGELFISH)
+                                {
+                                    if (Bb.OurTomcodsSet.Count + Bb.OurAngelfishesSet.Count < 4)
+                                    {
+                                        return;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    public bool shouldSpawn(Species s, int spawnCount)
+    {
+        if (s.SpeciesNum == (int)SpeciesIndex.TOMCOD)
+        {
+            if (Bb.OurTomcodsSet.Count >= 3)
+            {
+                return false;
+            }
+            return true;
+        }
+        else if (s.SpeciesNum == (int)SpeciesIndex.ANGELFISH)
+        {
+            return true;
+        }
+        else if (spawnCount > 3)
+        {
+            return false;
+        }
+        else if (s.SpeciesNum == (int)SpeciesIndex.SEA_STAR && Bb.OurStarfishSet.Count > 2)
+        {
+            return false;
+        }
+        else if (s.SpeciesNum == (int)SpeciesIndex.SPONGE && Bb.OurSpongesSet.Count > 2)
+        {
+            return false;
+        }
+        else if (s.SpeciesNum == (int)SpeciesIndex.SEA_URCHIN && Bb.OurUrchinsSet.Count >= 2)
+        {
+            return false;
+        }
+        else if (nonCarryCount() >= carryCount() + maxExtraNonCarries || nonCarryCount() > 6)
+        {
+            return false;
+        }
+
+
+        return true;
+    }
+
+    public bool isNonCarry(Species s)
+    {
+        if (s.SpeciesNum == (int)SpeciesIndex.CONESHELL_SNAIL ||
+            s.SpeciesNum == (int)SpeciesIndex.SEA_URCHIN ||
+            s.SpeciesNum == (int)SpeciesIndex.OCTOPUS ||
+            s.SpeciesNum == (int)SpeciesIndex.REEF_SHARK ||
+            s.SpeciesNum == (int)SpeciesIndex.CUTTLEFISH ||
+            s.SpeciesNum == (int)SpeciesIndex.CLEANER_SHRIMP ||
+            s.SpeciesNum == (int)SpeciesIndex.ELECTRIC_EEL ||
+            s.SpeciesNum == (int)SpeciesIndex.JELLYFISH)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public int carryCount()
+    {
+        return Bb.OurAngelfishesSet.Count + Bb.OurTomcodsSet.Count + Bb.OurStarfishSet.Count;
+    }
+
+    public int nonCarryCount()
+    {
+        return Bb.OurSnailsSet.Count + Bb.OurUrchinsSet.Count + Bb.OurOctopiSet.Count +
+            Bb.OurSharksSet.Count + Bb.OurCuttlefishesSet.Count + Bb.OurShrimpsSet.Count +
+            Bb.OurEelsSet.Count + Bb.OurJellyfishSet.Count;
     }
 
     public List<Species> calcPreferedSpecies()
@@ -181,9 +352,9 @@ class AI : BaseAI
 
     public bool saveMoney()
     {
-        if (turnNumber() < 455 && turnNumber() % seasonLength() < 21 && getNextSelectionPriority() > getThisSeasonPriority())
+        if (turnNumber() < 455 && turnNumber() % seasonLength() > 39 && getNextSelectionPriority() > getThisSeasonPriority())
         {
-            return false;
+            return true;
         }
         return false;
     }
@@ -267,7 +438,6 @@ class AI : BaseAI
 
     public void assignmissions()
     {
-        missions.Clear();
         assignStarfish();
         assignSponges();
         assignAngelfishes();
@@ -289,6 +459,8 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurStarfishSet)
         {
             List<Mission> mission = new List<Mission>();
+            mission.Add(new Mission(f, Objective.getTrash, ourTrash));//todo: if starfish is not on their reef
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
             mission.Add(new Mission(f, Objective.goTo, () => Bb.TheirDeepestReef));//todo: if not implemented go to edge
             mission.Add(new Mission(f, Objective.surviveWithInTarget, () => Bb.TheirReef, false));
 
@@ -301,6 +473,7 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurSpongesSet)
         {
             List<Mission> mission = new List<Mission>();
+            mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
@@ -315,8 +488,9 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurAngelfishesSet)
         {
             List<Mission> mission = new List<Mission>();
+            mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
-            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirDeepestReef));//todo: change their reef to their coves??
+            mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));//todo: change their reef to their coves??
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
             mission.Add(new Mission(f, Objective.dontsuicide, () => Bb.TheirReef));
             mission.Add(new Mission(f, Objective.attackTarget, notUrchin));
@@ -363,6 +537,7 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurTomcodsSet)
         {
             List<Mission> mission = new List<Mission>();
+            mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));//todo:dump at coves/far
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirDeepestReef));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
@@ -394,6 +569,7 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurShrimpsSet)
         {
             List<Mission> mission = new List<Mission>();
+            mission.Add(new Mission(f, Objective.getTrash, () => Bb.OurCoveMap));
             mission.Add(new Mission(f, Objective.getTrash, ourTrash));
             mission.Add(new Mission(f, Objective.dumpTrash, () => Bb.TheirReef));
             mission.Add(new Mission(f, Objective.attackTarget, () => Bb.OurFishMap));
