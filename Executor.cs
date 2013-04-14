@@ -65,18 +65,21 @@ namespace Pizza
 
             Bb.Update(ai);
 
-            BitArray targets = new BitArray(mission.m_targets());
+            BitArray targets = new BitArray(mission.m_targets()).And(Bb.TrashMap);
             BitArray passableOrTrash = Bb.GetPassable(fishPoint).Or(targets);
 
             while (availableCapacity > 0)
             {
                 var path = Pather.aStar(fishPoint, targets, passableOrTrash).ToArray();
+                var trash = path[path.Length - 1];
+                var tile = ai.getTile(trash.X, trash.Y);
+                var amount = Math.Min(Math.Min(tile.TrashAmount, availableCapacity), fish.CurrentHealth - 1);
+                if (amount == 0)
+                {
+                    return; // Can't pick it up
+                }
                 if (path.Length > 1 && MoveAlong(fish, path.Range(0, path.Length - 1)))
                 {
-                    var trash = path[path.Length - 1];
-                    var tile = ai.getTile(trash.X, trash.Y);
-                    var amount = Math.Min(tile.TrashAmount, availableCapacity);
-                    if (amount == 0) Environment.Exit(1);
                     Console.WriteLine("{0} picking up {1} at {2}", fish.Text(), amount, trash);
                     fish.pickUp(tile, amount);
 
@@ -124,9 +127,9 @@ namespace Pizza
             for (int i = 1; i < fullPath.Length && fish.MovementLeft > 0; ++i)
             {
                 Point moveTo = fullPath[i];
-                Console.WriteLine("({0},{1}) moving to {2}", fish.X, fish.Y, moveTo);
                 fish.move(moveTo.X, moveTo.Y);
             }
+            Console.WriteLine("{0} moved to {1}", fish.Text(), fish.Point());
 
             var goal = fullPath.Last();
             return fish.X == goal.X && fish.Y == goal.Y;

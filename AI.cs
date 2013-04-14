@@ -83,7 +83,8 @@ class AI : BaseAI
         spawn();
         Executor.Execute(this, fishes.Where(f => f.Owner == playerID()).Select(f => new Mission[]
             {
-                new Mission(f, Objective.getTrash, () => Bb.OurTrashMap),
+                new Mission(f, Objective.getTrash, () => Bb.OurReef),
+                new Mission(f, Objective.getTrash, () => Bb.NeutralReef),
                 new Mission(f, Objective.dumpTrash, () => Bb.TheirReef)
             }.ToList()
         ).ToList());
