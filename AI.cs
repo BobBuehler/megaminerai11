@@ -70,12 +70,15 @@ class AI : BaseAI
     {
         Bb.Update(this);
         spawn();
+        assignmissions();
+        Executor.Execute(this,missions);
+        /*
         Executor.Execute(this, fishes.Where(f => f.Owner == playerID()).Select(f => new Mission[]
             {
                 new Mission(f, Objective.getTrash, () => new BitArray(Bb.OurReef).Or(Bb.NeutralReef)),
                 new Mission(f, Objective.dumpTrash, () => Bb.TheirReef)
             }.ToList()
-        ).ToList());
+        ).ToList());*/
         return true;
     }
 
@@ -282,7 +285,7 @@ class AI : BaseAI
         foreach (Fish f in Bb.OurStarfishSet)
         {
             List<Mission> mission = new List<Mission>();
-            mission.Add(new Mission(f, Objective.goTo, () => Bb.TheirReef));
+            mission.Add(new Mission(f, Objective.goTo, () => Bb.TheirReef));//todo: if not implemented go to edge
             mission.Add(new Mission(f, Objective.surviveWithInTarget, ourTrash, false));
             missions.Add(mission);
         }
